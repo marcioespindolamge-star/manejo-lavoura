@@ -1,4 +1,4 @@
-name: Ajuste mobile e cabecalho
+name: Corrigir interface mobile
 
 on:
   push:
@@ -13,31 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Ajustar index.html para iPhone e cabecalho
+      - name: Corrigir logo e interface do celular
         run: |
           python - <<'PY'
           from pathlib import Path
+          import base64,re
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
 
-          s=s.replace('https://raw.githubusercontent.com/marcioespindolamge-star/manejo-lavoura/main/logo-paineira.jpg','logo-paineira.jpg')
+          # Logo incorporado no proprio HTML: nao depende de caminho externo no GitHub Pages.
+          logo=base64.b64encode(Path('logo-paineira.jpg').read_bytes()).decode()
+          data='data:image/jpeg;base64,'+logo
+          s=re.sub(r'<img class="header-logo"[^>]*>',f'<img class="header-logo" src="{data}" alt="Logo Agropecuária Paineira">',s,count=1)
 
-          old='''@media(max-width:1050px){header{grid-template-columns:140px 1fr;padding:0 15px}.side{display:none}.head h1{font-size:32px}.head small{font-size:11px}.logo-wrap{width:110px;height:95px}header:before{background:linear-gradient(110deg,var(--g) 0 14%,transparent 14% 100%)}}@media(max-width:760px){header{height:110px;grid-template-columns:76px 1fr;padding:0 10px;gap:8px}.logo-wrap{width:68px;height:68px;padding:3px}.head{text-align:left}.head h1{font-size:23px}.head b{font-size:8px;letter-spacing:1.5px}.head small{font-size:9px;white-space:normal}.layout{grid-template-columns:1fr}nav{flex-direction:row;overflow:auto}.s4,.s8{grid-column:span 12}.r2,.date-row,.product-row{grid-template-columns:1fr}}'''
-
-          new='''@media(max-width:1050px){header{height:104px;grid-template-columns:112px 1fr;padding:0 14px;gap:8px}.side{display:none}.head h1{font-size:29px}.head small{font-size:10px}.head b{font-size:10px;letter-spacing:2.5px}.logo-wrap{width:90px;height:82px;border-radius:12px}.layout{grid-template-columns:205px 1fr;min-height:calc(100vh - 104px)}nav{padding:12px 8px}nav button{padding:11px 12px}main{padding:18px}.card{padding:16px}.grid{gap:14px}header:before{background:linear-gradient(110deg,var(--g) 0 13%,transparent 13% 100%)}}@media(max-width:760px){html,body{max-width:100%;overflow-x:hidden}header{height:68px;grid-template-columns:52px 1fr;padding:0 8px;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));gap:7px;border-bottom-width:3px}header:before{background:linear-gradient(112deg,var(--g) 0 13%,transparent 13% 100%)}.logo-wrap{width:46px;height:46px;padding:2px;border-radius:8px;box-shadow:0 2px 8px #0002}.head{text-align:left;overflow:hidden}.head h1{font-size:18px;line-height:1;margin:2px 0;letter-spacing:.1px}.head b{font-size:7px;letter-spacing:1px;line-height:1;overflow:hidden;text-overflow:ellipsis}.head small{font-size:8.5px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side{display:none}.layout{display:block;min-height:calc(100vh - 68px)}nav{position:sticky;top:0;z-index:20;display:flex;flex-direction:row;gap:3px;overflow-x:auto;white-space:nowrap;padding:5px 6px;padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right));-webkit-overflow-scrolling:touch;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{flex:0 0 auto;padding:8px 9px;border-radius:7px;font-size:11px;line-height:1.05;text-align:center}nav button.active{box-shadow:inset 0 -3px var(--y)}main{padding:9px;padding-left:max(9px,env(safe-area-inset-left));padding-right:max(9px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}.page>h2{font-size:18px;margin:7px 0 10px}.card{padding:11px;border-radius:10px;margin-bottom:10px;box-shadow:0 3px 12px #1c422b10}.grid{display:block}.s4,.s8{width:100%}.r2,.date-row,.product-row{grid-template-columns:1fr;gap:4px}label{font-size:10px;margin:3px 0 4px}input,select{font-size:16px;padding:8px 9px;min-height:38px;border-radius:7px;margin-bottom:8px}.btn{padding:8px 10px;border-radius:7px;font-size:12px;min-height:36px}.actions{gap:5px}.area-total,.summary{padding:9px;border-radius:8px;margin-bottom:9px;font-size:12px}.step{padding-top:10px;margin-top:10px}.lav-list,.prod-list{grid-template-columns:1fr;gap:6px;margin-top:6px}.choice{padding:8px;border-radius:8px;font-size:12px}.choice label{font-size:12px;text-transform:none;margin:0}.choice input[type=checkbox]{transform:scale(1.05);margin-right:5px}.date-row input,.product-row input{margin-bottom:4px}.subhead{font-size:15px;margin:14px 0 7px}#tblLav,#tblVar,#tblPro,#tblCompras,.board{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}table{font-size:11px;min-width:560px}th,td{padding:6px;white-space:nowrap}.board table{min-width:850px}.board th,.board td{white-space:normal;min-width:105px}.timeline{padding-left:12px}.event{padding:9px;margin-bottom:8px;font-size:12px}.tag{font-size:9px;padding:3px 6px}}@media(max-width:390px){header{grid-template-columns:46px 1fr;height:62px}.logo-wrap{width:40px;height:40px}.head h1{font-size:16px}.head b{font-size:6.5px}.head small{font-size:7.5px}.layout{min-height:calc(100vh - 62px)}nav button{font-size:10px;padding:7px 8px}main{padding:7px}.card{padding:9px}.page>h2{font-size:16px}table{font-size:10.5px}}'''
-
-          if old not in s:
-              raise SystemExit('Bloco responsivo antigo nao encontrado; nenhuma alteracao foi feita.')
-          s=s.replace(old,new)
-          s=s.replace('content="width=device-width,initial-scale=1"','content="width=device-width,initial-scale=1,viewport-fit=cover"')
+          # Substitui somente o bloco mobile atual, preservando todo o restante do sistema.
+          ini=s.index('@media(max-width:760px)')
+          fim=s.index('@media print',ini)
+          mobile='''@media(max-width:760px){html,body{max-width:100%;overflow-x:hidden}header{height:76px;grid-template-columns:58px minmax(0,1fr);padding:0 10px;gap:9px;border-bottom-width:3px}header:before{background:linear-gradient(112deg,var(--g) 0 14%,transparent 14% 100%)}.logo-wrap{width:52px;height:52px;padding:2px;border-radius:9px;box-shadow:0 2px 8px #0002}.head{text-align:left;overflow:hidden}.head h1{font-size:19px;line-height:1.05;margin:3px 0;white-space:nowrap}.head b{font-size:8px;letter-spacing:1.2px;line-height:1;white-space:nowrap}.head small{font-size:9px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side{display:none}.layout{display:block;min-height:calc(100vh - 76px)}nav{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;overflow:visible;white-space:normal;padding:5px 6px}nav button{min-width:0;padding:7px 3px;border-radius:7px;font-size:10.5px;line-height:1.1;text-align:center;white-space:normal}nav button.active{box-shadow:inset 0 -3px var(--y)}main{padding:10px}.page>h2{font-size:20px;margin:8px 0 12px}.card{padding:12px;border-radius:11px;margin-bottom:11px;box-shadow:0 3px 12px #1c422b10}.grid{display:block}.s4,.s8{width:100%}.r2{grid-template-columns:1fr 1fr;gap:9px}.date-row,.product-row{grid-template-columns:1fr;gap:4px}label{font-size:10px;margin:3px 0 4px}input,select{font-size:16px;padding:7px 9px;min-height:36px;border-radius:7px;margin-bottom:8px}.btn{padding:7px 9px;border-radius:7px;font-size:11px;min-height:34px}.actions{gap:5px}.area-total,.summary{padding:9px;border-radius:8px;margin-bottom:9px;font-size:12px}.step{padding-top:10px;margin-top:10px}.lav-list,.prod-list{grid-template-columns:1fr;gap:6px;margin-top:6px}.choice{padding:8px;border-radius:8px;font-size:12px}.choice label{font-size:12px;text-transform:none;margin:0}.choice input[type=checkbox]{transform:scale(1.05);margin-right:5px}.subhead{font-size:15px;margin:14px 0 7px}#tblLav,#tblVar,#tblPro,#tblCompras,.board{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}table{font-size:11px;min-width:560px}th,td{padding:6px;white-space:nowrap}.board table{min-width:850px}.board th,.board td{white-space:normal;min-width:105px}.timeline{padding-left:12px}.event{padding:9px;margin-bottom:8px;font-size:12px}.tag{font-size:9px;padding:3px 6px}}@media(max-width:390px){header{height:70px;grid-template-columns:52px minmax(0,1fr)}.logo-wrap{width:46px;height:46px}.head h1{font-size:17px}.head b{font-size:7px}.head small{font-size:8px}nav button{font-size:9.5px;padding:6px 2px}main{padding:8px}.card{padding:10px}.page>h2{font-size:18px}.r2{gap:7px}}'''
+          s=s[:ini]+mobile+s[fim:]
           p.write_text(s,encoding='utf-8')
           PY
 
-      - name: Gravar alteracoes
+      - name: Gravar correcoes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git diff --cached --quiet && exit 0
-          git commit -m "Ajusta layout para iPhone e corrige cabecalho"
+          git commit -m "Corrige logo e layout compacto no celular"
           git push
