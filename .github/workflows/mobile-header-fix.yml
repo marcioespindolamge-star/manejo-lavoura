@@ -1,4 +1,4 @@
-name: Simplificar cabecalho
+name: Redimensionar para iPhone
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Simplificar cabecalho do sistema
+      - name: Redimensionar interface para iPhone
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -21,44 +21,12 @@ jobs:
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
 
-          # Remove logo e frase lateral do cabecalho.
-          s=re.sub(r'<div class="logo-wrap">.*?</div>','',s,count=1)
-          s=re.sub(r'<div class="side">.*?</div>','',s,count=1)
+          # Mantem desktop intacto e ajusta apenas celular.
+          mobile='''@media(max-width:760px){html,body{width:100%;max-width:100%;overflow-x:hidden}body{font-size:13px}header{height:50px;padding:0 6px;border-bottom-width:3px}.head{padding:2px 4px}.head h1{font-size:15px;line-height:1;margin:1px 0;letter-spacing:0}.head b{font-size:6px;letter-spacing:1px;margin-bottom:1px}.head small{display:none}.layout{display:block;min-height:calc(100vh - 50px)}nav{position:sticky;top:0;z-index:20;display:flex;flex-direction:row;gap:3px;overflow-x:auto;white-space:nowrap;padding:4px 5px;-webkit-overflow-scrolling:touch;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{flex:0 0 auto;min-width:auto;padding:6px 7px;border-radius:6px;font-size:9.5px;line-height:1;text-align:center;white-space:nowrap}nav button.active{box-shadow:inset 0 -3px var(--y)}main{padding:7px}.page>h2{font-size:16px;margin:6px 0 8px}.card{padding:8px;border-radius:9px;margin-bottom:8px;box-shadow:0 2px 8px #1c422b0d}.grid{display:block}.s4,.s8{width:100%}.r2{grid-template-columns:1fr 1fr;gap:6px}.date-row,.product-row{grid-template-columns:1fr;gap:3px}label{font-size:9px;margin:2px 0 3px}input,select{font-size:16px;padding:6px 7px;min-height:34px;border-radius:6px;margin-bottom:6px}.btn{padding:6px 8px;border-radius:6px;font-size:10px;min-height:32px}.actions{gap:4px}.area-total,.summary{padding:7px;border-radius:7px;margin-bottom:7px;font-size:11px}.step{padding-top:8px;margin-top:8px}.lav-list,.prod-list{grid-template-columns:1fr;gap:5px;margin-top:5px}.choice{padding:7px;border-radius:7px;font-size:11px}.choice label{font-size:11px;text-transform:none;margin:0}.choice input[type=checkbox]{transform:scale(1.02);margin-right:4px}.subhead{font-size:13px;margin:11px 0 6px}#tblLav,#tblVar,#tblPro,#tblCompras,.board{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;border-radius:7px}table{font-size:10px;min-width:500px}th,td{padding:5px;white-space:nowrap}.board table{min-width:760px}.board th,.board td{white-space:normal;min-width:92px;padding:5px}.timeline{padding-left:10px}.event{padding:7px;margin-bottom:6px;font-size:11px}.tag{font-size:8px;padding:2px 5px}}'''
+          tiny='''@media(max-width:390px){header{height:46px}.head h1{font-size:14px}.head b{font-size:5.6px}.layout{min-height:calc(100vh - 46px)}nav{padding:3px 4px}nav button{font-size:8.8px;padding:6px 6px}main{padding:6px}.card{padding:7px}.page>h2{font-size:15px}.r2{gap:5px}table{font-size:9.5px;min-width:470px}}'''
 
-          # Cabecalho desktop mais limpo e centralizado.
-          s=re.sub(r'header\{[^}]*\}',
-                   'header{height:96px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffffff 0%,#f8fbf9 100%);border-bottom:4px solid var(--y);overflow:hidden;padding:0 20px}',
-                   s,count=1)
-          s=re.sub(r'header:before\{[^}]*\}',
-                   'header:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--g);z-index:0}',
-                   s,count=1)
-          s=re.sub(r'\.head\{[^}]*\}',
-                   '.head{z-index:2;text-align:center;min-width:0;padding:8px 18px}',
-                   s,count=1)
-          s=re.sub(r'\.head b\{[^}]*\}',
-                   '.head b{display:block;font-size:11px;letter-spacing:4px;color:var(--g);white-space:nowrap;margin-bottom:3px}',
-                   s,count=1)
-          s=re.sub(r'\.head h1\{[^}]*\}',
-                   '.head h1{margin:2px 0;font-size:34px;line-height:1.05;color:var(--g);white-space:nowrap}',
-                   s,count=1)
-          s=re.sub(r'\.head small\{[^}]*\}',
-                   '.head small{display:block;font-weight:700;color:#466253;font-size:12px;white-space:nowrap}',
-                   s,count=1)
-          s=s.replace('min-height:calc(100vh - 112px)','min-height:calc(100vh - 96px)')
-
-          # Tablet.
-          s=re.sub(r'@media\(max-width:1050px\)\{.*?\}(?=@media\(max-width:760px\))',
-                   '@media(max-width:1050px){header{height:86px;padding:0 14px}.head h1{font-size:28px}.head b{font-size:9px;letter-spacing:2.5px}.head small{font-size:10px}.layout{grid-template-columns:205px 1fr;min-height:calc(100vh - 86px)}nav{padding:12px 8px}nav button{padding:11px 12px}main{padding:18px}.card{padding:16px}.grid{gap:14px}}',
-                   s,count=1,flags=re.S)
-
-          # Celular: cabeçalho simples, sem logo, mantendo o restante compacto.
-          s=re.sub(r'@media\(max-width:760px\)\{.*?\}(?=@media\(max-width:390px\))',
-                   '@media(max-width:760px){html,body{max-width:100%;overflow-x:hidden}header{height:58px;padding:0 8px;border-bottom-width:3px}.head{padding:4px 6px}.head h1{font-size:17px;line-height:1;margin:2px 0}.head b{font-size:6.8px;letter-spacing:1.2px;margin-bottom:2px}.head small{font-size:8px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.layout{display:block;min-height:calc(100vh - 58px)}nav{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;overflow:visible;white-space:normal;padding:5px 6px}nav button{min-width:0;padding:7px 3px;border-radius:7px;font-size:10.5px;line-height:1.1;text-align:center;white-space:normal}nav button.active{box-shadow:inset 0 -3px var(--y)}main{padding:10px}.page>h2{font-size:20px;margin:8px 0 12px}.card{padding:12px;border-radius:11px;margin-bottom:11px;box-shadow:0 3px 12px #1c422b10}.grid{display:block}.s4,.s8{width:100%}.r2{grid-template-columns:1fr 1fr;gap:9px}.date-row,.product-row{grid-template-columns:1fr;gap:4px}label{font-size:10px;margin:3px 0 4px}input,select{font-size:16px;padding:7px 9px;min-height:36px;border-radius:7px;margin-bottom:8px}.btn{padding:7px 9px;border-radius:7px;font-size:11px;min-height:34px}.actions{gap:5px}.area-total,.summary{padding:9px;border-radius:8px;margin-bottom:9px;font-size:12px}.step{padding-top:10px;margin-top:10px}.lav-list,.prod-list{grid-template-columns:1fr;gap:6px;margin-top:6px}.choice{padding:8px;border-radius:8px;font-size:12px}.choice label{font-size:12px;text-transform:none;margin:0}.choice input[type=checkbox]{transform:scale(1.05);margin-right:5px}.subhead{font-size:15px;margin:14px 0 7px}#tblLav,#tblVar,#tblPro,#tblCompras,.board{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}table{font-size:11px;min-width:560px}th,td{padding:6px;white-space:nowrap}.board table{min-width:850px}.board th,.board td{white-space:normal;min-width:105px}.timeline{padding-left:12px}.event{padding:9px;margin-bottom:8px;font-size:12px}.tag{font-size:9px;padding:3px 6px}}',
-                   s,count=1,flags=re.S)
-          s=re.sub(r'@media\(max-width:390px\)\{.*?\}(?=@media print)',
-                   '@media(max-width:390px){header{height:54px}.head h1{font-size:16px}.head b{font-size:6.3px}.head small{font-size:7.4px}.layout{min-height:calc(100vh - 54px)}nav button{font-size:9.5px;padding:6px 2px}main{padding:8px}.card{padding:10px}.page>h2{font-size:18px}.r2{gap:7px}}',
-                   s,count=1,flags=re.S)
-
+          s=re.sub(r'@media\(max-width:760px\)\{.*?\}(?=@media\(max-width:390px\))',mobile,s,count=1,flags=re.S)
+          s=re.sub(r'@media\(max-width:390px\)\{.*?\}(?=@media print)',tiny,s,count=1,flags=re.S)
           p.write_text(s,encoding='utf-8')
           PY
 
@@ -68,5 +36,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git diff --cached --quiet && exit 0
-          git commit -m "Simplifica cabecalho sem logo e frase lateral"
+          git commit -m "Redimensiona interface para uso no iPhone"
           git push
