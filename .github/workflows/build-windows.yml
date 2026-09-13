@@ -23,7 +23,7 @@ jobs:
           node-version: '22'
       - name: Instalar dependencias
         run: npm install
-      - name: Gerar executavel
+      - name: Gerar executavel atualizado para PC
         run: npm run dist
       - name: Publicar executavel para download
         uses: actions/upload-artifact@v4
