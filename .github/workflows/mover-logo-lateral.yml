@@ -1,0 +1,49 @@
+name: Mover logo para lateral
+
+on:
+  push:
+    paths:
+      - '.github/workflows/mover-logo-lateral.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mover brasao do cabecalho para menu lateral
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          old='<header><div class="logo-wrap"><img class="header-logo" src="./logo-paineira-novo.png" alt="Agropecuária Paineira"></div><div class="head">'
+          new='<header><div class="head">'
+          s=s.replace(old,new,1)
+
+          marker='</nav><main>'
+          logo='<div class="nav-logo"><img src="./logo-paineira-novo.png" alt="Agropecuária Paineira"></div>'
+          if logo not in s:
+              s=s.replace(marker,logo+marker,1)
+
+          css='nav{background:linear-gradient(#0e5a3b,#0b4c33);padding:18px 10px;display:flex;flex-direction:column;gap:8px}'
+          css_new=css+'.nav-logo{margin-top:26px;display:flex;justify-content:center;align-items:center;padding:8px}.nav-logo img{width:138px;height:138px;object-fit:contain;border-radius:50%;display:block}'
+          s=s.replace(css,css_new,1)
+
+          mobile='@media(max-width:760px){.logo-wrap{width:40px;height:40px;border-radius:50%;padding:1px;box-shadow:none;margin-right:4px}.header-logo{border-radius:50%}'
+          mobile_new='@media(max-width:760px){.nav-logo{display:none}.logo-wrap{width:40px;height:40px;border-radius:50%;padding:1px;box-shadow:none;margin-right:4px}.header-logo{border-radius:50%}'
+          s=s.replace(mobile,mobile_new,1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Salvar mudanca
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Move brasao para a lateral do sistema"
+          git push
