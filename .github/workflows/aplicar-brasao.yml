@@ -1,0 +1,40 @@
+name: Aplicar novo brasao
+
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-brasao.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Colocar brasao no cabecalho e no executavel
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<header><div class="head">','<header><div class="logo-wrap"><img class="header-logo" src="./logo-paineira-novo.png" alt="Agropecuária Paineira"></div><div class="head">',1)
+          s=s.replace('@media(max-width:760px){html,body','@media(max-width:760px){.logo-wrap{width:40px;height:40px;border-radius:50%;padding:1px;box-shadow:none;margin-right:4px}.header-logo{border-radius:50%}html,body',1)
+          p.write_text(s,encoding='utf-8')
+
+          q=Path('package.json')
+          d=json.loads(q.read_text(encoding='utf-8'))
+          files=d.setdefault('build',{}).setdefault('files',[])
+          if 'logo-paineira-novo.png' not in files: files.append('logo-paineira-novo.png')
+          q.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Salvar alteracao
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html package.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Exibe novo brasao da Agropecuaria Paineira no sistema"
+          git push
