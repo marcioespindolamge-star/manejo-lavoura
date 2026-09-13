@@ -1,0 +1,50 @@
+name: Integrar aplicativo Windows com SQLite
+
+on:
+  push:
+    paths:
+      - '.github/workflows/desktop-sqlite.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adaptar interface para banco local
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          old="let db=JSON.parse(localStorage.getItem(KEY)||'{\"lavouras\":[],\"safras\":[],\"produtos\":[],\"compras\":[],\"aplicacoes\":[]}');"
+          new="let __raw=(window.desktopStore&&window.desktopStore.load?window.desktopStore.load():localStorage.getItem(KEY));let db=JSON.parse(__raw||'{\"lavouras\":[],\"safras\":[],\"produtos\":[],\"compras\":[],\"aplicacoes\":[]}');"
+          if old in s:
+              s=s.replace(old,new,1)
+
+          oldsave="function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}"
+          newsave="function save(){let j=JSON.stringify(db);if(window.desktopStore&&window.desktopStore.save)window.desktopStore.save(j);else localStorage.setItem(KEY,j);render()}"
+          if oldsave in s:
+              s=s.replace(oldsave,newsave,1)
+
+          marker="function salvarPDF(){if(!$('relLav').value)return alert('Selecione uma lavoura.');window.print()}"
+          addon="""function salvarPDF(){if(!$('relLav').value)return alert('Selecione uma lavoura.');window.print()}async function fazerBackup(){if(!window.desktopStore)return;let r=await window.desktopStore.backup();if(r&&r.ok)alert('Backup salvo com sucesso.');}async function restaurarBackup(){if(!window.desktopStore)return;if(!confirm('Restaurar um backup? Os dados atuais serão substituídos.'))return;let r=await window.desktopStore.restore();if(r&&r.ok){alert('Backup restaurado com sucesso.');location.reload()}else if(r&&r.error)alert('Não foi possível restaurar o backup.')}function initDesktopTools(){if(!window.desktopStore||document.getElementById('desktopTools'))return;let b=document.createElement('div');b.id='desktopTools';b.className='no-print';b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:99;display:flex;gap:7px;background:#fff;padding:8px;border:1px solid #d9e3dc;border-radius:10px;box-shadow:0 4px 18px #0002';b.innerHTML='<button class=\"btn\" onclick=\"fazerBackup()\">💾 Backup</button><button class=\"btn\" onclick=\"restaurarBackup()\">↩ Restaurar</button>';document.body.appendChild(b)}"""
+          if marker in s and 'function initDesktopTools()' not in s:
+              s=s.replace(marker,addon,1)
+
+          if 'initDesktopTools();render();' not in s:
+              s=s.replace('render();</script>', 'initDesktopTools();render();</script>', 1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Gravar integracao
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Usa SQLite no aplicativo Windows e adiciona backup"
+          git push
