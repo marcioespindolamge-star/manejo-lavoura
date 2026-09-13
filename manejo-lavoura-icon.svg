@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#eef5f7"/>
+  <circle cx="256" cy="256" r="218" fill="#1769aa" stroke="#0b477b" stroke-width="22"/>
+  <circle cx="256" cy="256" r="185" fill="#dff1ff" stroke="#fff" stroke-width="8"/>
+  <path d="M72 302 Q180 225 440 270 L440 365 Q245 315 72 382Z" fill="#4f8e3d"/>
+  <path d="M90 330 Q220 275 426 310" fill="none" stroke="#9cc95e" stroke-width="12"/>
+  <g fill="#1267ad" stroke="#17394f" stroke-width="8" stroke-linejoin="round">
+    <path d="M170 215h145l45 70H155z"/>
+    <path d="M225 140h86l35 75H205z"/>
+  </g>
+  <path d="M242 155h55l25 52h-92z" fill="#bfe9ff" stroke="#17394f" stroke-width="7"/>
+  <circle cx="192" cy="300" r="61" fill="#172d38"/><circle cx="192" cy="300" r="30" fill="#c8d5dc"/>
+  <circle cx="350" cy="307" r="45" fill="#172d38"/><circle cx="350" cy="307" r="21" fill="#c8d5dc"/>
+  <path d="M152 220h-42v-19h60" fill="none" stroke="#17394f" stroke-width="10"/>
+  <g fill="#3f8b3b" stroke="#23632b" stroke-width="4">
+    <ellipse cx="355" cy="245" rx="18" ry="42" transform="rotate(-40 355 245)"/>
+    <ellipse cx="390" cy="225" rx="17" ry="39" transform="rotate(35 390 225)"/>
+    <ellipse cx="415" cy="260" rx="18" ry="42" transform="rotate(55 415 260)"/>
+    <ellipse cx="385" cy="285" rx="16" ry="38" transform="rotate(-20 385 285)"/>
+  </g>
+  <path d="M360 220q30 48 42 98" fill="none" stroke="#23632b" stroke-width="8"/>
+  <rect x="67" y="367" width="378" height="84" rx="30" fill="#0d4d86" stroke="#fff" stroke-width="5"/>
+  <text x="256" y="402" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="800" fill="#fff">MANEJO DA</text>
+  <text x="256" y="438" text-anchor="middle" font-family="Arial,sans-serif" font-size="35" font-weight="900" fill="#fff">LAVOURA</text>
+</svg>
