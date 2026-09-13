@@ -24,13 +24,16 @@
       "index.html",
       "desktop/**/*",
       "manejo-lavoura-icon.svg",
-      "package.json"
+      "package.json",
+      "logo-paineira-novo.png"
     ],
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": ["portable"],
+      "target": [
+        "portable"
+      ],
       "artifactName": "Manejo-da-Lavoura-${version}.exe"
     }
   }
