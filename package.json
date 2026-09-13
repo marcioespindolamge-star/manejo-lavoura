@@ -1,0 +1,37 @@
+{
+  "name": "manejo-da-lavoura",
+  "version": "1.0.0",
+  "description": "Manejo da Lavoura - aplicativo local para Windows",
+  "main": "desktop/main.js",
+  "author": "Agropecuaria Paineira",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "br.com.paineira.manejolavoura",
+    "productName": "Manejo da Lavoura",
+    "asar": true,
+    "files": [
+      "index.html",
+      "desktop/**/*",
+      "manejo-lavoura-icon.svg",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["portable"],
+      "artifactName": "Manejo-da-Lavoura-${version}.exe"
+    }
+  }
+}
