@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/editar-excluir-lavouras.yml'
+      - 'scripts/aplicar_correcoes.py'
 
 permissions:
   contents: write
@@ -13,88 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Aplicar Editar Excluir e corrigir brasao lateral
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-
-          # Corrige definitivamente a area do brasao lateral no PC.
-          import re
-          s=re.sub(r'\.nav-logo\{[^}]*\}', '.nav-logo{margin-top:18px;display:flex;justify-content:center;align-items:center;width:100%;padding:10px 0 16px;min-height:220px;height:220px;flex:0 0 220px;overflow:visible}', s, count=1)
-          s=re.sub(r'\.nav-logo img\{[^}]*\}', '.nav-logo img{display:block;width:190px;height:190px;min-width:190px;min-height:190px;max-width:190px;max-height:190px;object-fit:contain;object-position:center;border-radius:50%;flex:0 0 190px}', s, count=1)
-
-          marker='/* LAVOURAS_EDITAR_EXCLUIR_V2 */'
-          if marker not in s:
-              patch=r'''
-<script>
-/* LAVOURAS_EDITAR_EXCLUIR_V2 */
-let lavEditId='';
-function cancelarEdicaoLavoura(){
-  lavEditId='';
-  const f=document.getElementById('fLav'); if(f)f.reset();
-  const b=document.getElementById('lavCancelar'); if(b)b.style.display='none';
-  const sv=document.getElementById('lavSalvar'); if(sv)sv.textContent='Salvar';
-}
-function editarLavoura(id){
-  const l=db.lavouras.find(x=>String(x.id)===String(id)); if(!l)return;
-  lavEditId=l.id;
-  $('lavCodigo').value=l.codigo||'';
-  $('lavNome').value=l.nome||'';
-  $('lavArea').value=l.area||'';
-  const b=document.getElementById('lavCancelar'); if(b)b.style.display='inline-block';
-  const sv=document.getElementById('lavSalvar'); if(sv)sv.textContent='Salvar alteração';
-  $('lavCodigo').focus();
-}
-function excluirLavoura(id){
-  const l=db.lavouras.find(x=>String(x.id)===String(id)); if(!l)return;
-  const usada=(db.safras||[]).some(x=>String(x.lavouraId)===String(id)) ||
-              (db.aplicacoes||[]).some(x=>String(x.lavouraId)===String(id)) ||
-              (db.manejos||[]).some(x=>String(x.lavouraId)===String(id));
-  if(usada)return alert('Esta lavoura possui variedade ou manejo registrado e não pode ser excluída.');
-  if(!confirm('Excluir a lavoura '+(l.nome||l.codigo)+'?'))return;
-  db.lavouras=db.lavouras.filter(x=>String(x.id)!==String(id));
-  save(); cancelarEdicaoLavoura(); renderAll();
-}
-function renderLav(){
-  $('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA:</b> '+db.lavouras.reduce((a,l)=>a+n(l.area),0).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha';
-  $('tblLav').innerHTML='<table><tr><th>Código</th><th>Lavoura</th><th>Área</th><th>Ações</th></tr>'+db.lavouras.map(l=>'<tr><td>'+esc(l.codigo||'')+'</td><td><b>'+esc(l.nome||'')+'</b></td><td>'+n(l.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button class="btn" type="button" onclick="editarLavoura(\''+l.id+'\')">✏️ Editar</button> <button class="btn danger" type="button" onclick="excluirLavoura(\''+l.id+'\')">🗑 Excluir</button></td></tr>').join('')+'</table>';
-}
-(function(){
-  const f=document.getElementById('fLav'); if(!f)return;
-  const actions=f.querySelector('.actions');
-  if(actions) actions.innerHTML='<button type="button" id="lavCancelar" class="btn" style="display:none" onclick="cancelarEdicaoLavoura()">Cancelar</button><button id="lavSalvar" class="btn pri">Salvar</button>';
-  f.onsubmit=function(e){
-    e.preventDefault();
-    const codigo=$('lavCodigo').value.trim();
-    const nome=$('lavNome').value.trim();
-    const area=n($('lavArea').value);
-    if(!codigo||!nome||area<=0)return alert('Preencha código, nome e área da lavoura.');
-    const duplicada=db.lavouras.some(x=>String(x.id)!==String(lavEditId)&&String(x.codigo||'').toLowerCase()===codigo.toLowerCase());
-    if(duplicada)return alert('Já existe uma lavoura com este código/nome.');
-    if(lavEditId){
-      const l=db.lavouras.find(x=>String(x.id)===String(lavEditId));
-      if(l){l.codigo=codigo;l.nome=nome;l.area=area;}
-    }else{
-      db.lavouras.push({id:uid(),codigo,nome,area});
-    }
-    save(); cancelarEdicaoLavoura(); renderAll();
-  };
-  renderLav();
-})();
-</script>
-'''
-              s=s.replace('</body>',patch+'</body>',1)
-
-          p.write_text(s,encoding='utf-8')
-          PY
-      - name: Verificar alteracoes no arquivo
-        run: |
-          grep -q 'LAVOURAS_EDITAR_EXCLUIR_V2' index.html
-          grep -q '✏️ Editar' index.html
-          grep -q '🗑 Excluir' index.html
-          grep -q 'min-height:220px' index.html
+      - name: Aplicar correcoes
+        run: python scripts/aplicar_correcoes.py
       - name: Salvar alteracao
         run: |
           git config user.name "github-actions[bot]"
