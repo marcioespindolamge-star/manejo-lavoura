@@ -1,0 +1,123 @@
+name: Areas no menu com editar e excluir
+
+on:
+  push:
+    paths:
+      - '.github/workflows/areas-editar-excluir.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aplicar alteracoes no sistema online
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('>🌱 Lavouras</button>', '>🌱 Áreas</button>')
+
+          marker='/* AREAS_MENU_EDIT_V1 */'
+          if marker not in s:
+              patch=r'''
+<script>
+/* AREAS_MENU_EDIT_V1 */
+let areaEditId='';
+function cancelarEdicaoArea(){
+  areaEditId='';
+  const f=document.getElementById('fLav');
+  if(f) f.reset();
+  const b=document.getElementById('areaCancelar');
+  if(b) b.style.display='none';
+  const sv=document.getElementById('areaSalvar');
+  if(sv) sv.textContent='Salvar';
+}
+function editarArea(id){
+  const a=(db.lavouras||[]).find(x=>String(x.id)===String(id));
+  if(!a) return;
+  areaEditId=a.id;
+  $('lavCodigo').value=a.codigo||'';
+  $('lavNome').value=a.nome||'';
+  $('lavArea').value=a.area||'';
+  const b=document.getElementById('areaCancelar');
+  if(b) b.style.display='inline-block';
+  const sv=document.getElementById('areaSalvar');
+  if(sv) sv.textContent='Salvar alteração';
+  $('lavCodigo').focus();
+}
+function excluirArea(id){
+  const a=(db.lavouras||[]).find(x=>String(x.id)===String(id));
+  if(!a) return;
+  const usada=(db.safras||[]).some(x=>String(x.lavouraId)===String(id)) ||
+              (db.aplicacoes||[]).some(x=>String(x.lavouraId)===String(id)) ||
+              (db.manejos||[]).some(x=>String(x.lavouraId)===String(id));
+  if(usada) return alert('Esta área possui variedade ou manejo registrado e não pode ser excluída.');
+  if(!confirm('Excluir a área '+(a.nome||a.codigo)+'?')) return;
+  db.lavouras=db.lavouras.filter(x=>String(x.id)!==String(id));
+  save();
+  cancelarEdicaoArea();
+  renderAreasTabela();
+}
+function renderAreasTabela(){
+  const total=(db.lavouras||[]).reduce((s,a)=>s+n(a.area),0);
+  $('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';
+  $('tblLav').innerHTML='<table><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr>'+
+    (db.lavouras||[]).map(a=>'<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button class="btn" type="button" onclick="editarArea(\''+a.id+'\')">Editar</button> <button class="btn danger" type="button" onclick="excluirArea(\''+a.id+'\')">Excluir</button></td></tr>').join('')+
+    '</table>';
+}
+(function(){
+  const f=document.getElementById('fLav');
+  if(!f) return;
+  const actions=f.querySelector('.actions');
+  if(actions) actions.innerHTML='<button type="button" id="areaCancelar" class="btn" style="display:none" onclick="cancelarEdicaoArea()">Cancelar</button><button id="areaSalvar" class="btn pri">Salvar</button>';
+  f.onsubmit=function(e){
+    e.preventDefault();
+    const codigo=$('lavCodigo').value.trim();
+    const nome=$('lavNome').value.trim();
+    const area=n($('lavArea').value);
+    if(!codigo||!nome||area<=0) return alert('Preencha código, nome e área.');
+    const duplicada=(db.lavouras||[]).some(x=>String(x.id)!==String(areaEditId) && String(x.codigo||'').toLowerCase()===codigo.toLowerCase());
+    if(duplicada) return alert('Já existe uma área com este código.');
+    if(areaEditId){
+      const a=db.lavouras.find(x=>String(x.id)===String(areaEditId));
+      if(a){a.codigo=codigo;a.nome=nome;a.area=area;}
+    }else{
+      db.lavouras.push({id:uid(),codigo,nome,area});
+    }
+    save();
+    cancelarEdicaoArea();
+    renderAreasTabela();
+  };
+
+  const renderOriginal=render;
+  render=function(){
+    renderOriginal();
+    renderAreasTabela();
+  };
+  renderAreasTabela();
+})();
+</script>
+'''
+              s=s.replace('</body>',patch+'</body>',1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Conferir alteracoes
+        run: |
+          grep -q '🌱 Áreas' index.html
+          grep -q 'AREAS_MENU_EDIT_V1' index.html
+          grep -q '>Editar</button>' index.html
+          grep -q '>Excluir</button>' index.html
+      - name: Salvar no repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Troca menu para Areas e adiciona Editar Excluir"
+          git push
