@@ -1,0 +1,36 @@
+name: Corrigir logo lateral
+
+on:
+  push:
+    paths:
+      - '.github/workflows/corrigir-logo-lateral.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  corrigir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Corrigir area do brasao na lateral
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='.nav-logo{margin-top:26px;display:flex;justify-content:center;align-items:center;padding:8px}.nav-logo img{width:138px;height:138px;object-fit:contain;border-radius:50%;display:block}'
+          new='.nav-logo{margin-top:22px;display:flex;justify-content:center;align-items:center;padding:8px;height:166px;min-height:166px;flex:0 0 166px;overflow:visible}.nav-logo img{display:block;width:150px;height:150px;min-width:150px;min-height:150px;max-width:150px;max-height:150px;object-fit:contain;object-position:center;border-radius:50%;flex:0 0 150px}'
+          if old not in s:
+              raise SystemExit('CSS esperado do logo lateral nao encontrado')
+          s=s.replace(old,new,1)
+          s=s.replace('nav{background:linear-gradient(#0e5a3b,#0b4c33);padding:18px 10px;display:flex;flex-direction:column;gap:8px}', 'nav{background:linear-gradient(#0e5a3b,#0b4c33);padding:18px 10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden}',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Salvar correcao
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Corrige brasao completo na lateral" || exit 0
+          git push
