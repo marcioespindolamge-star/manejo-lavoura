@@ -1,0 +1,38 @@
+name: Limpar campos depois de salvar Area
+
+on:
+  push:
+    paths:
+      - '.github/workflows/limpar-campos-area.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Garantir limpeza e foco apos salvar
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="save(); cancelarEdicaoArea(); renderAreasTabela();\n  };"
+          new="save(); cancelarEdicaoArea(); renderAreasTabela();\n    $('lavCodigo').value=''; $('lavNome').value=''; $('lavArea').value=''; $('lavCodigo').focus();\n  };"
+          if old in s:
+            s=s.replace(old,new,1)
+          elif "/* LIMPAR_AREA_APOS_SALVAR_V1 */" not in s:
+            s=s.replace('</body>',r'''\n<script>\n/* LIMPAR_AREA_APOS_SALVAR_V1 */\nconst _cancelarEdicaoAreaLimpa=cancelarEdicaoArea;\ncancelarEdicaoArea=function(){\n _cancelarEdicaoAreaLimpa();\n const c=document.getElementById('lavCodigo'), nm=document.getElementById('lavNome'), ar=document.getElementById('lavArea');\n if(c)c.value=''; if(nm)nm.value=''; if(ar)ar.value='';\n};\n</script>\n</body>''',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Conferir limpeza
+        run: grep -q "lavCodigo').value=''" index.html
+      - name: Publicar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Limpa campos depois de salvar uma area"
+          git push
