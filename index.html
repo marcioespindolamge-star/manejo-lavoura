@@ -111,6 +111,7 @@ function renderAreasTabela(){
       const a=db.lavouras.find(x=>String(x.id)===String(areaEditId)); if(a){a.codigo=codigo;a.nome=nome;a.area=area;}
     }else db.lavouras.push({id:uid(),codigo,nome,area});
     save(); cancelarEdicaoArea(); renderAreasTabela();
+    $('lavCodigo').value=''; $('lavNome').value=''; $('lavArea').value=''; $('lavCodigo').focus();
   };
   const renderOriginal=render;
   render=function(){renderOriginal();renderAreasTabela();};
