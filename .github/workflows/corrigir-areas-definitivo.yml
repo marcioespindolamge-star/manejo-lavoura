@@ -1,0 +1,36 @@
+name: Corrigir tela Areas definitivo
+on:
+  push:
+    paths:
+      - '.github/workflows/corrigir-areas-definitivo.yml'
+permissions:
+  contents: write
+jobs:
+  corrigir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Corrigir tela Areas
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text(encoding='utf-8')
+          marker='/* AREAS_DEFINITIVO_V3 */'
+          if marker not in s:
+            patch=r'''\n<script>\n/* AREAS_DEFINITIVO_V3 */\n(function(){\n let editId=null;\n const form=document.getElementById('fLav');\n const cod=document.getElementById('lavCodigo'), nome=document.getElementById('lavNome'), area=document.getElementById('lavArea');\n function limpar(){editId=null;cod.value='';nome.value='';area.value='';cod.focus();}\n window.renderAreasTabela=function(){\n   const total=(db.lavouras||[]).reduce((s,a)=>s+n(a.area),0);\n   document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';\n   document.getElementById('tblLav').innerHTML='<table><thead><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr></thead><tbody>'+\n   (db.lavouras||[]).map(a=>'<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button type="button" class="btn" data-edit-area="'+a.id+'">Editar</button> <button type="button" class="btn danger" data-del-area="'+a.id+'">Excluir</button></td></tr>').join('')+'</tbody></table>';\n };\n form.onsubmit=function(e){\n   e.preventDefault();\n   const codigo=cod.value.trim(), nm=nome.value.trim(), ar=n(area.value);\n   if(!codigo||!nm||ar<=0)return alert('Preencha Código/Nome, Nome e Área total.');\n   const duplicada=(db.lavouras||[]).find(a=>String(a.codigo||'').toLowerCase()===codigo.toLowerCase() && a.id!==editId);\n   if(duplicada)return alert('Já existe uma área com este Código/Nome.');\n   if(editId){const a=db.lavouras.find(x=>x.id===editId);if(a){a.codigo=codigo;a.nome=nm;a.area=ar;}}\n   else db.lavouras.push({id:uid(),codigo,nome:nm,area:ar});\n   save(); renderAll(); limpar();\n };\n window.editarArea=function(id){const a=db.lavouras.find(x=>x.id===id);if(!a)return;editId=id;cod.value=a.codigo||'';nome.value=a.nome||'';area.value=a.area||'';cod.focus();};\n window.excluirArea=function(id){\n   const a=db.lavouras.find(x=>x.id===id);if(!a)return;\n   const usada=(db.safras||[]).some(x=>x.lavouraId===id)||(db.aplicacoes||[]).some(x=>x.lavouraId===id)||(db.manejos||[]).some(x=>x.lavouraId===id);\n   if(usada)return alert('Esta área possui variedade ou manejo vinculado e não pode ser excluída.');\n   if(!confirm('Excluir a área '+(a.nome||a.codigo)+'?'))return;\n   db.lavouras=db.lavouras.filter(x=>x.id!==id);save();renderAll();limpar();\n };\n document.getElementById('tblLav').onclick=function(e){const b=e.target.closest('button');if(!b)return;if(b.dataset.editArea)editarArea(b.dataset.editArea);if(b.dataset.delArea)excluirArea(b.dataset.delArea);};\n renderAreasTabela();\n})();\n</script>\n'''
+            s=s.replace('</body>',patch+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validar correcao
+        run: |
+          grep -q 'AREAS_DEFINITIVO_V3' index.html
+          grep -q 'data-edit-area' index.html
+          grep -q 'data-del-area' index.html
+          grep -q "cod.value='';nome.value='';area.value=''" index.html
+      - name: Publicar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Corrige funcionamento completo da tela Areas"
+          git push
