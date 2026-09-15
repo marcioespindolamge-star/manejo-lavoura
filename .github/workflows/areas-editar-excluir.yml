@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Aplicar alteracoes
+      - name: Aplicar titulo Areas e acoes Editar Excluir
         run: python .github/scripts/patch_areas.py
       - name: Conferir alteracoes
         run: |
           grep -q '🌱 Áreas' index.html
+          grep -q '<h2>ÁREAS</h2>' index.html
           grep -q 'AREAS_MENU_EDIT_V1' index.html
           grep -q '>Editar</button>' index.html
           grep -q '>Excluir</button>' index.html
@@ -27,5 +28,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git diff --cached --quiet && exit 0
-          git commit -m "Troca menu para Areas e adiciona Editar Excluir"
+          git commit -m "Troca titulo para Areas e mantem Editar Excluir"
           git push
