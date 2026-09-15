@@ -1,0 +1,28 @@
+name: Integrar Firebase
+on:
+  push:
+    paths:
+      - 'scripts/add-firebase.py'
+      - '.github/workflows/integrar-firebase.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Integrar Firebase ao sistema
+        run: python scripts/add-firebase.py
+      - name: Validar integracao
+        run: |
+          grep -q 'FIREBASE_SYNC_V1' index.html
+          grep -q 'manejo-lavoura.firebaseapp.com' index.html
+      - name: Publicar alteracao
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Integra Firebase ao Manejo Lavoura"
+          git push
