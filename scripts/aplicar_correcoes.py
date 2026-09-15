@@ -1,81 +1,70 @@
 from pathlib import Path
 import re
 
-p = Path('index.html')
-s = p.read_text(encoding='utf-8')
+p=Path('index.html')
+s=p.read_text(encoding='utf-8')
 
-# Corrige a area do brasao lateral no PC.
-s = re.sub(r'\.nav-logo\{[^}]*\}', '.nav-logo{margin-top:18px;display:flex;justify-content:center;align-items:center;width:100%;padding:10px 0 16px;min-height:220px;height:220px;flex:0 0 220px;overflow:visible}', s, count=1)
-s = re.sub(r'\.nav-logo img\{[^}]*\}', '.nav-logo img{display:block;width:190px;height:190px;min-width:190px;min-height:190px;max-width:190px;max-height:190px;object-fit:contain;object-position:center;border-radius:50%;flex:0 0 190px}', s, count=1)
+# Remove todas as correcoes antigas empilhadas depois do script principal.
+markers=['LAVOURAS_EDITAR_EXCLUIR_V2','AREAS_MENU_EDIT_V1','FORCAR_ACOES_AREAS_V2','AREAS_DEFINITIVO_V3','AREAS_UNICA_V4','AREAS_UNICA_V5','AREAS_LIMPA_V6']
+for marker in markers:
+    s=re.sub(r'<script>\s*(?:\\n)?\s*/\*\s*'+re.escape(marker)+r'\s*\*/.*?</script>\s*(?:\\n)?', '', s, flags=re.S)
 
-marker = '/* LAVOURAS_EDITAR_EXCLUIR_V2 */'
-if marker not in s:
-    patch = r'''
-<script>
-/* LAVOURAS_EDITAR_EXCLUIR_V2 */
-let lavEditId='';
-function cancelarEdicaoLavoura(){
-  lavEditId='';
-  const f=document.getElementById('fLav'); if(f)f.reset();
-  const b=document.getElementById('lavCancelar'); if(b)b.style.display='none';
-  const sv=document.getElementById('lavSalvar'); if(sv)sv.textContent='Salvar';
-}
-function editarLavoura(id){
-  const l=db.lavouras.find(x=>String(x.id)===String(id)); if(!l)return;
-  lavEditId=l.id;
-  $('lavCodigo').value=l.codigo||'';
-  $('lavNome').value=l.nome||'';
-  $('lavArea').value=l.area||'';
-  const b=document.getElementById('lavCancelar'); if(b)b.style.display='inline-block';
-  const sv=document.getElementById('lavSalvar'); if(sv)sv.textContent='Salvar alteração';
-  $('lavCodigo').focus();
-}
-function excluirLavoura(id){
-  const l=db.lavouras.find(x=>String(x.id)===String(id)); if(!l)return;
-  const usada=(db.safras||[]).some(x=>String(x.lavouraId)===String(id)) ||
-              (db.aplicacoes||[]).some(x=>String(x.lavouraId)===String(id)) ||
-              (db.manejos||[]).some(x=>String(x.lavouraId)===String(id));
-  if(usada)return alert('Esta lavoura possui variedade ou manejo registrado e não pode ser excluída.');
-  if(!confirm('Excluir a lavoura '+(l.nome||l.codigo)+'?'))return;
-  db.lavouras=db.lavouras.filter(x=>String(x.id)!==String(id));
-  save(); cancelarEdicaoLavoura(); renderAll();
-}
-function renderLav(){
-  $('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA:</b> '+db.lavouras.reduce((a,l)=>a+n(l.area),0).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha';
-  $('tblLav').innerHTML='<table><tr><th>Código</th><th>Lavoura</th><th>Área</th><th>Ações</th></tr>'+db.lavouras.map(l=>'<tr><td>'+esc(l.codigo||'')+'</td><td><b>'+esc(l.nome||'')+'</b></td><td>'+n(l.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button class="btn" type="button" onclick="editarLavoura(\''+l.id+'\')">Editar</button> <button class="btn danger" type="button" onclick="excluirLavoura(\''+l.id+'\')">Excluir</button></td></tr>').join('')+'</table>';
-}
+patch=r'''<script>
+/* AREAS_LIMPA_V6 */
 (function(){
-  const f=document.getElementById('fLav'); if(!f)return;
-  const actions=f.querySelector('.actions');
-  if(actions) actions.innerHTML='<button type="button" id="lavCancelar" class="btn" style="display:none" onclick="cancelarEdicaoLavoura()">Cancelar</button><button id="lavSalvar" class="btn pri">Salvar</button>';
-  f.onsubmit=function(e){
+  const form=document.getElementById('fLav');
+  const cod=document.getElementById('lavCodigo');
+  const nome=document.getElementById('lavNome');
+  const area=document.getElementById('lavArea');
+  const tabela=document.getElementById('tblLav');
+  let editId='';
+  const sameId=(a,b)=>String(a)===String(b);
+  const html=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function limpar(){editId='';form.reset();cod.focus();}
+  function renderAreas(){
+    const lista=db.lavouras||[];
+    const total=lista.reduce((s,a)=>s+n(a.area),0);
+    document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';
+    tabela.innerHTML='<table><thead><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr></thead><tbody>'+lista.map(a=>'<tr><td>'+html(a.codigo)+'</td><td><b>'+html(a.nome)+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td style="white-space:nowrap"><button type="button" class="btn area-editar" data-id="'+html(a.id)+'">Editar</button> <button type="button" class="btn danger area-excluir" data-id="'+html(a.id)+'">Excluir</button></td></tr>').join('')+'</tbody></table>';
+  }
+  form.onsubmit=function(e){
     e.preventDefault();
-    const codigo=$('lavCodigo').value.trim();
-    const nome=$('lavNome').value.trim();
-    const area=n($('lavArea').value);
-    if(!codigo||!nome||area<=0)return alert('Preencha código, nome e área da lavoura.');
-    const duplicada=db.lavouras.some(x=>String(x.id)!==String(lavEditId)&&String(x.codigo||'').toLowerCase()===codigo.toLowerCase());
-    if(duplicada)return alert('Já existe uma lavoura com este código/nome.');
-    if(lavEditId){
-      const l=db.lavouras.find(x=>String(x.id)===String(lavEditId));
-      if(l){l.codigo=codigo;l.nome=nome;l.area=area;}
-    } else {
-      db.lavouras.push({id:uid(),codigo,nome,area});
-    }
-    save(); cancelarEdicaoLavoura(); renderAll();
+    const codigo=cod.value.trim(), nm=nome.value.trim(), hectares=n(area.value);
+    if(!codigo||!nm||hectares<=0)return alert('Preencha todos os campos da área.');
+    if((db.lavouras||[]).some(a=>!sameId(a.id,editId)&&String(a.codigo||'').trim().toLowerCase()===codigo.toLowerCase()))return alert('Já existe uma área com este Código/Nome.');
+    if(editId){const a=db.lavouras.find(x=>sameId(x.id,editId));if(!a)return;a.codigo=codigo;a.nome=nm;a.area=hectares;}
+    else db.lavouras.push({id:uid(),codigo,nome:nm,area:hectares});
+    save();
+    limpar();
+    renderAreas();
   };
-  renderLav();
+  tabela.onclick=function(e){
+    const b=e.target.closest('button[data-id]');if(!b)return;
+    const id=b.dataset.id;
+    const a=(db.lavouras||[]).find(x=>sameId(x.id,id));if(!a)return;
+    if(b.classList.contains('area-editar')){editId=String(id);cod.value=a.codigo||'';nome.value=a.nome||'';area.value=a.area||'';cod.focus();return;}
+    if(b.classList.contains('area-excluir')){
+      const usada=(db.safras||[]).some(x=>sameId(x.lavouraId,id))||(db.aplicacoes||[]).some(x=>sameId(x.lavouraId,id))||(db.manejos||[]).some(x=>sameId(x.lavouraId,id));
+      if(usada)return alert('Esta área possui variedade ou manejo vinculado e não pode ser excluída.');
+      if(!confirm('Excluir a área '+(a.nome||a.codigo)+'?'))return;
+      db.lavouras=db.lavouras.filter(x=>!sameId(x.id,id));
+      save();
+      limpar();
+      renderAreas();
+    }
+  };
+  const renderBase=render;
+  render=function(){renderBase();renderAreas();};
+  window.renderAreasTabela=renderAreas;
+  renderAreas();
 })();
 </script>
 '''
-    s = s.replace('</body>', patch + '</body>', 1)
+s=s.replace('</body>',patch+'</body>',1)
+p.write_text(s,encoding='utf-8')
 
-p.write_text(s, encoding='utf-8')
-
-# Falha explicitamente se as correcoes nao estiverem presentes.
-check = p.read_text(encoding='utf-8')
-assert marker in check
-assert '>Editar</button>' in check
-assert '>Excluir</button>' in check
-assert 'min-height:220px' in check
-print('CORRECOES_OK')
+check=p.read_text(encoding='utf-8')
+assert check.count('AREAS_LIMPA_V6')==1
+assert 'renderAll()' not in check
+assert 'area-editar' in check and 'area-excluir' in check
+print('AREAS_V6_OK')
