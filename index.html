@@ -117,4 +117,4 @@ function renderAreasTabela(){
   renderAreasTabela();
 })();
 </script>
-</body></html>
+\n<script>\n/* FORCAR_ACOES_AREAS_V2 */\nfunction renderTabelaAreasFinal(){\n const total=(db.lavouras||[]).reduce((s,a)=>s+n(a.area),0);\n document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';\n document.getElementById('tblLav').innerHTML='<table><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr>'+\n (db.lavouras||[]).map(a=>'<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td style="white-space:nowrap"><button class="btn" type="button" onclick="editarArea(\\''+a.id+'\\')">Editar</button> <button class="btn danger" type="button" onclick="excluirArea(\\''+a.id+'\\')">Excluir</button></td></tr>').join('')+'</table>';\n}\nconst _renderAreasAnterior=renderAreasTabela;\nrenderAreasTabela=function(){ renderTabelaAreasFinal(); };\nrenderTabelaAreasFinal();\n</script>\n</body></html>
