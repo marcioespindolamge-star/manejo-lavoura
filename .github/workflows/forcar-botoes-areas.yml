@@ -1,0 +1,43 @@
+name: Forcar botoes Editar Excluir Areas
+
+on:
+  push:
+    paths:
+      - '.github/workflows/forcar-botoes-areas.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  corrigir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Corrigir tabela de areas
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<section id="lavouras" class="page active"><h2>LAVOURAS</h2>','<section id="lavouras" class="page active"><h2>ÁREAS</h2>')
+          # garante que a rotina nova rode depois de qualquer renderizacao antiga
+          marker='/* FORCAR_ACOES_AREAS_V2 */'
+          if marker not in s:
+            code=r'''\n<script>\n/* FORCAR_ACOES_AREAS_V2 */\nfunction renderTabelaAreasFinal(){\n const total=(db.lavouras||[]).reduce((s,a)=>s+n(a.area),0);\n document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';\n document.getElementById('tblLav').innerHTML='<table><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr>'+\n (db.lavouras||[]).map(a=>'<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td style="white-space:nowrap"><button class="btn" type="button" onclick="editarArea(\\''+a.id+'\\')">Editar</button> <button class="btn danger" type="button" onclick="excluirArea(\\''+a.id+'\\')">Excluir</button></td></tr>').join('')+'</table>';\n}\nconst _renderAreasAnterior=renderAreasTabela;\nrenderAreasTabela=function(){ renderTabelaAreasFinal(); };\nrenderTabelaAreasFinal();\n</script>\n'''
+            s=s.replace('</body>',code+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Conferir botoes no HTML
+        run: |
+          grep -q '<h2>ÁREAS</h2>' index.html
+          grep -q '<th>Ações</th>' index.html
+          grep -q 'onclick="editarArea' index.html
+          grep -q 'onclick="excluirArea' index.html
+          grep -q 'FORCAR_ACOES_AREAS_V2' index.html
+      - name: Publicar correcao
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Forca exibicao dos botoes Editar e Excluir em Areas"
+          git push
