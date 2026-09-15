@@ -1,78 +1,65 @@
 name: Limpar remendos e corrigir Areas
+
 on:
   push:
     paths:
       - '.github/workflows/limpar-remendos-areas.yml'
+
 permissions:
   contents: write
+
 jobs:
   corrigir:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Remover patches antigos e instalar rotina unica
+      - name: Corrigir Areas
+        shell: bash
         run: |
-          python - <<'PY'
+          cat > /tmp/corrigir.py <<'PY'
           from pathlib import Path
           import re
-          p=Path('index.html'); s=p.read_text(encoding='utf-8')
-          # Remove todos os scripts de remendo antigos da tela Areas.
-          for marker in ['AREAS_MENU_EDIT_V1','FORCAR_ACOES_AREAS_V2','LIMPAR_AREA_APOS_SALVAR_V1','AREAS_DEFINITIVO_V3']:
-              s=re.sub(r'<script>\s*/\*\s*'+re.escape(marker)+r'\s*\*/.*?</script>\s*','',s,flags=re.S)
-          patch=r'''<script>
-/* AREAS_UNICA_V4 */
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          for marker in ('AREAS_MENU_EDIT_V1','FORCAR_ACOES_AREAS_V2','LIMPAR_AREA_APOS_SALVAR_V1','AREAS_DEFINITIVO_V3','AREAS_UNICA_V4'):
+              s = re.sub(r'<script>\s*/\*\s*' + re.escape(marker) + r'\s*\*/.*?</script>\s*', '', s, flags=re.S)
+          patch = '''<script>
+/* AREAS_UNICA_V5 */
 (function(){
- const form=document.getElementById('fLav');
- const cod=document.getElementById('lavCodigo');
- const nome=document.getElementById('lavNome');
- const area=document.getElementById('lavArea');
- const tabela=document.getElementById('tblLav');
- let editId=null;
- function limparArea(){editId=null;form.reset();cod.focus();}
- function renderAreas(){
-   const lista=db.lavouras||[];
-   const total=lista.reduce((s,a)=>s+n(a.area),0);
-   document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';
-   tabela.innerHTML='<table><thead><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr></thead><tbody>'+lista.map(a=>'<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button type="button" class="btn area-editar" data-id="'+a.id+'">Editar</button> <button type="button" class="btn danger area-excluir" data-id="'+a.id+'">Excluir</button></td></tr>').join('')+'</tbody></table>';
- }
- form.onsubmit=function(e){
-   e.preventDefault();
-   const codigo=cod.value.trim(), nm=nome.value.trim(), hectares=n(area.value);
-   if(!codigo||!nm||hectares<=0){alert('Preencha todos os campos da área.');return;}
-   if((db.lavouras||[]).some(a=>a.id!==editId&&String(a.codigo||'').trim().toLowerCase()===codigo.toLowerCase())){alert('Já existe uma área com este Código/Nome.');return;}
-   if(editId){const a=db.lavouras.find(x=>x.id===editId);if(!a)return;a.codigo=codigo;a.nome=nm;a.area=hectares;}
-   else db.lavouras.push({id:uid(),codigo:codigo,nome:nm,area:hectares});
-   save(); renderAll(); renderAreas(); limparArea();
- };
- tabela.onclick=function(e){
-   const b=e.target.closest('button[data-id]'); if(!b)return;
-   const id=b.dataset.id;
-   if(b.classList.contains('area-editar')){
-     const a=db.lavouras.find(x=>x.id===id);if(!a)return;
-     editId=id;cod.value=a.codigo||'';nome.value=a.nome||'';area.value=a.area||'';cod.focus();return;
-   }
-   if(b.classList.contains('area-excluir')){
-     const a=db.lavouras.find(x=>x.id===id);if(!a)return;
-     const usada=(db.safras||[]).some(x=>x.lavouraId===id)||(db.aplicacoes||[]).some(x=>x.lavouraId===id)||(db.manejos||[]).some(x=>x.lavouraId===id);
-     if(usada){alert('Esta área possui variedade ou manejo vinculado e não pode ser excluída.');return;}
-     if(!confirm('Excluir a área '+(a.nome||a.codigo)+'?'))return;
-     db.lavouras=db.lavouras.filter(x=>x.id!==id);save();renderAll();renderAreas();limparArea();
-   }
- };
- window.renderAreasTabela=renderAreas;
- renderAreas();
+  var form=document.getElementById('fLav'), cod=document.getElementById('lavCodigo'), nome=document.getElementById('lavNome'), area=document.getElementById('lavArea'), tabela=document.getElementById('tblLav');
+  var editId=null;
+  function limpar(){editId=null;form.reset();cod.focus();}
+  function renderAreas(){
+    var lista=db.lavouras||[], total=lista.reduce(function(s,a){return s+n(a.area)},0);
+    document.getElementById('totalLav').innerHTML='<b>ÁREA TOTAL CADASTRADA: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</b>';
+    tabela.innerHTML='<table><thead><tr><th>Código</th><th>Área</th><th>Tamanho</th><th>Ações</th></tr></thead><tbody>'+lista.map(function(a){return '<tr><td>'+esc(a.codigo||'')+'</td><td><b>'+esc(a.nome||'')+'</b></td><td>'+n(a.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td><button type="button" class="btn area-editar" data-id="'+a.id+'">Editar</button> <button type="button" class="btn danger area-excluir" data-id="'+a.id+'">Excluir</button></td></tr>'}).join('')+'</tbody></table>';
+  }
+  form.onsubmit=function(e){
+    e.preventDefault();
+    var codigo=cod.value.trim(), nm=nome.value.trim(), hectares=n(area.value);
+    if(!codigo||!nm||hectares<=0){alert('Preencha todos os campos da área.');return;}
+    if((db.lavouras||[]).some(function(a){return a.id!==editId&&String(a.codigo||'').trim().toLowerCase()===codigo.toLowerCase()})){alert('Já existe uma área com este Código/Nome.');return;}
+    if(editId){var a=db.lavouras.find(function(x){return x.id===editId});if(!a)return;a.codigo=codigo;a.nome=nm;a.area=hectares;}
+    else{db.lavouras.push({id:uid(),codigo:codigo,nome:nm,area:hectares});}
+    save();renderAll();renderAreas();limpar();
+  };
+  tabela.onclick=function(e){
+    var b=e.target.closest('button[data-id]');if(!b)return;var id=b.getAttribute('data-id');
+    if(b.classList.contains('area-editar')){var a=db.lavouras.find(function(x){return x.id===id});if(!a)return;editId=id;cod.value=a.codigo||'';nome.value=a.nome||'';area.value=a.area||'';cod.focus();return;}
+    if(b.classList.contains('area-excluir')){var a=db.lavouras.find(function(x){return x.id===id});if(!a)return;var usada=(db.safras||[]).some(function(x){return x.lavouraId===id})||(db.aplicacoes||[]).some(function(x){return x.lavouraId===id})||(db.manejos||[]).some(function(x){return x.lavouraId===id});if(usada){alert('Esta área possui variedade ou manejo vinculado e não pode ser excluída.');return;}if(!confirm('Excluir a área '+(a.nome||a.codigo)+'?'))return;db.lavouras=db.lavouras.filter(function(x){return x.id!==id});save();renderAll();renderAreas();limpar();}
+  };
+  window.renderAreasTabela=renderAreas;
+  renderAreas();
 })();
 </script>
 '''
-          s=s.replace('</body>',patch+'</body>',1)
-          p.write_text(s,encoding='utf-8')
+          s = s.replace('</body>', patch + '</body>', 1)
+          p.write_text(s, encoding='utf-8')
           PY
-      - name: Validar que ficou uma rotina
+          python /tmp/corrigir.py
+      - name: Validar
         run: |
-          grep -q 'AREAS_UNICA_V4' index.html
-          ! grep -q 'AREAS_MENU_EDIT_V1' index.html
-          ! grep -q 'FORCAR_ACOES_AREAS_V2' index.html
-          ! grep -q 'AREAS_DEFINITIVO_V3' index.html
+          grep -q 'AREAS_UNICA_V5' index.html
           grep -q 'form.reset()' index.html
           grep -q 'area-editar' index.html
           grep -q 'area-excluir' index.html
@@ -81,5 +68,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Remove remendos e deixa rotina unica de Areas"
+          git commit -m "Corrige definitivamente a tela Areas"
           git push
