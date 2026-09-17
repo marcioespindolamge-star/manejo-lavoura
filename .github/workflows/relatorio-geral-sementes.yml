@@ -1,6 +1,8 @@
 name: Corrigir relatorio geral
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/relatorio-geral-sementes.yml'
 permissions:
   contents: write
 jobs:
