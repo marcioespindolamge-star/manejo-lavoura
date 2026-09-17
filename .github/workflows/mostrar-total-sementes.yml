@@ -1,0 +1,37 @@
+name: Mostrar total de sementes usadas
+on:
+  push:
+    paths:
+      - '.github/workflows/mostrar-total-sementes.yml'
+permissions:
+  contents: write
+jobs:
+  ajustar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mostrar somente total de sementes na aba Variedade
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='<div class="card s8" id="tblVar"></div>'
+          new='<div class="card s8"><div id="totalSementesUsadas" class="summary"></div><div id="tblVar"></div></div>'
+          if old not in s:
+              raise SystemExit('Local da tabela de variedades nao encontrado')
+          s=s.replace(old,new,1)
+          marker="$('tblVar').innerHTML='<table>"
+          repl="let totalSem=db.safras.reduce((s,x)=>s+(n(x.sementeTotalKg)||(n(x.sementeKgHa)*n(lav(x.lavouraId)?.area))),0);$('totalSementesUsadas').innerHTML='<b>TOTAL DE SEMENTES USADAS: '+totalSem.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</b>';$('tblVar').innerHTML='<table>"
+          if marker not in s:
+              raise SystemExit('Render da tabela de variedades nao encontrado')
+          s=s.replace(marker,repl,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Publicar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Mostra total de sementes usadas na Variedade [skip ci]'
+          git push
