@@ -1,0 +1,55 @@
+name: Adicionar sementes em Variedade
+on:
+  push:
+    paths:
+      - '.github/workflows/adicionar-semente-variedade.yml'
+permissions:
+  contents: write
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adicionar campos e cálculo
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='<label>Ciclo</label><input id="varCiclo" placeholder="Ex.: 120 dias"><label>Observação</label>'
+          new='<label>Ciclo</label><input id="varCiclo" placeholder="Ex.: 120 dias"><label>Semente kg/ha</label><input id="varSementeKgHa" type="number" step="0.01" min="0" oninput="calcSementeVar()"><div id="varSementeTotal" class="summary"><b>QUANTIDADE DE SEMENTES: 0 kg</b></div><label>Observação</label>'
+          if old not in s:
+              raise SystemExit('Trecho do formulário Variedade não encontrado')
+          s=s.replace(old,new,1)
+          # Acrescenta funções sem alterar as rotinas existentes.
+          marker='function editarVariedade(id)'
+          helper="""function calcSementeVar(){let l=lav($('varLav').value),kg=n($('varSementeKgHa').value),total=l?kg*n(l.area):0;$('varSementeTotal').innerHTML='<b>QUANTIDADE DE SEMENTES: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</b>'}function salvarSementeVar(){let id=$('varEditId').value;if(!id)return;let x=db.safras.find(v=>v.id===id);if(x){x.sementeKgHa=n($('varSementeKgHa').value);let l=lav(x.lavouraId);x.sementeTotalKg=l?n(l.area)*x.sementeKgHa:0;localStorage.setItem(KEY,JSON.stringify(db))}}"""
+          if marker not in s:
+              raise SystemExit('Função editarVariedade não encontrada')
+          s=s.replace(marker,helper+marker,1)
+          # Ao editar, carrega kg/ha e recalcula.
+          needle="$ ('varCiclo')".replace(' ','')
+          # Inserção robusta imediatamente antes de mostrar o botão Cancelar.
+          target="$ ('varCancelar')".replace(' ','')+".style.display='inline-block'"
+          if target in s:
+              s=s.replace(target,"$('varSementeKgHa').value=x.sementeKgHa||'';calcSementeVar();"+target,1)
+          # Atualiza o cálculo quando a lavoura mudar.
+          s=s.replace('<select id="varLav" required></select>','<select id="varLav" required onchange="calcSementeVar()"></select>',1)
+          # Persiste o novo dado depois de qualquer submit de Variedade já existente.
+          s=s.replace("$('fVar').onsubmit=e=>{", "$('fVar').onsubmit=e=>{",1)
+          # Colunas na tabela de Variedade.
+          s=s.replace('<th>Ciclo</th><th>Ações</th>','<th>Ciclo</th><th>Semente kg/ha</th><th>Semente total</th><th>Ações</th>',1)
+          s=s.replace("<td>${x.ciclo||'-'}</td><td><button", "<td>${x.ciclo||'-'}</td><td>${n(x.sementeKgHa).toLocaleString('pt-BR')} kg/ha</td><td>${(n(x.sementeTotalKg)||(n(x.sementeKgHa)*n(lav(x.lavouraId)?.area))).toLocaleString('pt-BR',{maximumFractionDigits:2})} kg</td><td><button",1)
+          # Captura kg/ha no objeto ao salvar, cobrindo os padrões usados no arquivo.
+          s=s.replace("ciclo:$('varCiclo').value,obs:$('varObs').value", "ciclo:$('varCiclo').value,sementeKgHa:n($('varSementeKgHa').value),sementeTotalKg:n($('varSementeKgHa').value)*n(lav($('varLav').value)?.area),obs:$('varObs').value")
+          s=s.replace("x.ciclo=$('varCiclo').value;x.obs=$('varObs').value", "x.ciclo=$('varCiclo').value;x.sementeKgHa=n($('varSementeKgHa').value);x.sementeTotalKg=x.sementeKgHa*n(lav(x.lavouraId)?.area);x.obs=$('varObs').value")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Publicar alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Implementa semente kg/ha e total de sementes"
+          git push
