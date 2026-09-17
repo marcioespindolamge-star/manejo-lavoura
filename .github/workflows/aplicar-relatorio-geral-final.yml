@@ -1,0 +1,31 @@
+name: Aplicar relatorio geral final
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-relatorio-geral-final.yml'
+permissions:
+  contents: write
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar relatorio sem alterar outras funcoes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="./relatorio-geral-sementes.js?v=20260917"></script>'
+          if tag not in s:
+              if '</body>' not in s: raise SystemExit('body nao encontrado')
+              s=s.replace('</body>',tag+'</body>',1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Publicar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Instala relatório geral de sementes'
+          git push
