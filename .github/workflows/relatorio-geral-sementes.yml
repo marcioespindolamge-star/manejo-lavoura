@@ -1,0 +1,38 @@
+name: Relatorio geral sementes
+on:
+  push:
+    paths:
+      - '.github/workflows/relatorio-geral-sementes.yml'
+permissions:
+  contents: write
+jobs:
+  ajustar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adicionar somente relatorio geral de sementes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='<section id="relatorios" class="page"><h2>RELATÓRIO POR LAVOURA</h2>'
+          new='<section id="relatorios" class="page"><h2>RELATÓRIO POR LAVOURA</h2><div class="card no-print"><div class="actions" style="justify-content:flex-start"><button class="btn pri" onclick="relatorioGeralSementes()">RELATÓRIO GERAL DE SEMENTES</button></div></div><div id="relGeralSementes"></div>'
+          if old not in s:
+              raise SystemExit('Inicio da aba Relatorios nao encontrado')
+          s=s.replace(old,new,1)
+          marker='function gerarRelatorio()'
+          func="""function relatorioGeralSementes(){let linhas=db.lavouras.map(l=>{let vs=db.safras.filter(v=>String(v.lavouraId)===String(l.id));let kg=vs.reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0);let kgha=vs.length?vs.reduce((t,v)=>t+n(v.sementeKgHa),0):0;return '<tr><td>'+l.nome+'</td><td>'+n(l.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td>'+vs.map(v=>v.variedade||'').filter(Boolean).join(', ')+'</td><td>'+kgha.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg/ha</td><td><b>'+kg.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</b></td><td>'+(kg/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td></tr>'}).join('');let total=db.lavouras.reduce((T,l)=>T+db.safras.filter(v=>String(v.lavouraId)===String(l.id)).reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0),0);$('relGeralSementes').innerHTML='<div class=\"card\"><h2 style=\"text-align:center\">RELATÓRIO GERAL DE SEMENTES</h2><table><thead><tr><th>Área / Lavoura</th><th>Área (ha)</th><th>Variedade</th><th>Semente kg/ha</th><th>Sementes (kg)</th><th>Sacas 60 kg</th></tr></thead><tbody>'+linhas+'</tbody><tfoot><tr><th colspan=\"4\">TOTAL</th><th>'+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</th><th>'+(total/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</th></tr></tfoot></table><div class=\"actions no-print\" style=\"margin-top:12px\"><button class=\"btn pri\" onclick=\"window.print()\">Imprimir</button></div></div>';}
+"""
+          if marker not in s:
+              raise SystemExit('Funcao de relatorio nao encontrada')
+          s=s.replace(marker,func+marker,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Publicar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Adiciona relatorio geral de sementes por area [skip ci]'
+          git push
