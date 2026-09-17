@@ -1,0 +1,36 @@
+name: Aplicar relatorio sementes final
+on: [push]
+permissions:
+  contents: write
+jobs:
+  aplicar:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inserir relatorio
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          if 'RELATÓRIO GERAL DE SEMENTES' not in s:
+              alvo = '<section id="relatorios" class="page"><h2>RELATÓRIO POR LAVOURA</h2>'
+              novo = alvo + '<div class="card no-print"><button class="btn pri" onclick="relatorioGeralSementes()">RELATÓRIO GERAL DE SEMENTES</button></div><div id="relGeralSementes"></div>'
+              if alvo not in s:
+                  raise SystemExit('Aba relatorios nao encontrada')
+              s = s.replace(alvo, novo, 1)
+              marcador = 'function gerarRelatorio()'
+              fn = '''function relatorioGeralSementes(){let linhas=db.lavouras.map(l=>{let vs=db.safras.filter(v=>String(v.lavouraId)===String(l.id));let kg=vs.reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0);let kgha=vs.reduce((t,v)=>t+n(v.sementeKgHa),0);return '<tr><td>'+l.nome+'</td><td>'+n(l.area).toLocaleString('pt-BR',{maximumFractionDigits:2})+' ha</td><td>'+vs.map(v=>v.variedade||'').filter(Boolean).join(', ')+'</td><td>'+kgha.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg/ha</td><td><b>'+kg.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</b></td><td>'+(kg/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td></tr>'}).join('');let total=db.lavouras.reduce((T,l)=>T+db.safras.filter(v=>String(v.lavouraId)===String(l.id)).reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0),0);$('relGeralSementes').innerHTML='<div class="card"><h2 style="text-align:center">RELATÓRIO GERAL DE SEMENTES</h2><table><thead><tr><th>Área / Lavoura</th><th>Área (ha)</th><th>Variedade</th><th>Semente kg/ha</th><th>Sementes (kg)</th><th>Sacas 60 kg</th></tr></thead><tbody>'+linhas+'</tbody><tfoot><tr><th colspan="4">TOTAL</th><th>'+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</th><th>'+(total/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</th></tr></tfoot></table><div class="actions no-print" style="margin-top:12px"><button class="btn pri" onclick="window.print()">Imprimir</button></div></div>';}
+'''
+              if marcador not in s:
+                  raise SystemExit('Funcao gerarRelatorio nao encontrada')
+              s = s.replace(marcador, fn + marcador, 1)
+              p.write_text(s, encoding='utf-8')
+      - name: Salvar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Adiciona relatorio geral de sementes [skip ci]"
+          git push
