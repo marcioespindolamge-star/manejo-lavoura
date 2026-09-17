@@ -1,8 +1,8 @@
 name: Relatorio Geral Sementes
-'on':
+on:
   push:
     paths:
-      - .github/workflows/relatorio-geral-sementes.yml
+      - '.github/workflows/relatorio-geral-sementes.yml'
 permissions:
   contents: write
 jobs:
@@ -18,8 +18,8 @@ jobs:
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
           alvo='<section id="relatorios" class="page"><h2>RELATÓRIO POR LAVOURA</h2>'
+          novo=alvo+'<div class="card no-print"><button class="btn pri" onclick="relatorioGeralSementes()">RELATÓRIO GERAL DE SEMENTES</button></div><div id="relGeralSementes"></div>'
           if 'RELATÓRIO GERAL DE SEMENTES</button>' not in s:
-              novo=alvo+'<div class="card no-print"><button class="btn pri" onclick="relatorioGeralSementes()">RELATÓRIO GERAL DE SEMENTES</button></div><div id="relGeralSementes"></div>'
               if alvo not in s: raise SystemExit('aba relatorios nao encontrada')
               s=s.replace(alvo,novo,1)
           if 'function relatorioGeralSementes()' not in s:
@@ -30,9 +30,8 @@ jobs:
               s=s.replace(marker,f+marker,1)
           p.write_text(s,encoding='utf-8')
           PY
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Inclui relatorio geral de sementes [skip ci]'
+          git diff --cached --quiet || git commit -m 'Corrige relatorio geral de sementes [skip ci]'
           git push
-# executar agora
