@@ -1,0 +1,44 @@
+name: Remover Firebase Definitivo
+on:
+  push:
+    paths:
+      - '.github/workflows/remover-firebase-definitivo.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  remover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remover login e Firebase do index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<style>\n#fbLogin'
+          i=s.find(marker)
+          if i < 0:
+              print('Firebase/login já não existe no index.')
+          else:
+              end=s.rfind('</body></html>')
+              if end < 0:
+                  raise SystemExit('Fechamento do HTML não encontrado')
+              s=s[:i] + '</body></html>\n'
+              p.write_text(s,encoding='utf-8')
+              print('Login e Firebase removidos do index.html')
+          PY
+      - name: Publicar alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Sem alteração pendente"
+          else
+            git commit -m "Remove login Firebase do Manejo Lavoura"
+            git push
+          fi
