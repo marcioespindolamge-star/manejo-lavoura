@@ -30,3 +30,4 @@ jobs:
           git add index.html
           git commit -m 'Mostra sacas de 60 kg no total de sementes [skip ci]'
           git push
+# executar ajuste
