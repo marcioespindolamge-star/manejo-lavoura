@@ -36,3 +36,4 @@ jobs:
           git add index.html
           git commit -m 'Adiciona relatorio geral de sementes por area [skip ci]'
           git push
+# executar agora
