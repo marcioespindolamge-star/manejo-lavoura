@@ -23,7 +23,7 @@ jobs:
               if alvo not in s: raise SystemExit('aba relatorios nao encontrada')
               s=s.replace(alvo,novo,1)
           if 'function relatorioGeralSementes()' not in s:
-              f='''function relatorioGeralSementes(){let linhas=db.lavouras.map(l=>{let vs=db.safras.filter(v=>String(v.lavouraId)===String(l.id));let kg=vs.reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0);return '<tr><td>'+l.nome+'</td><td>'+n(l.area).toLocaleString('pt-BR')+' ha</td><td>'+vs.map(v=>v.variedade||'').filter(Boolean).join(', ')+'</td><td><b>'+kg.toLocaleString('pt-BR')+' kg</b></td><td>'+(kg/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td></tr>'}).join('');let total=db.lavouras.reduce((T,l)=>T+db.safras.filter(v=>String(v.lavouraId)===String(l.id)).reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(l.area))),0),0);$('relGeralSementes').innerHTML='<div class="card"><h2 style="text-align:center">RELATÓRIO GERAL DE SEMENTES</h2><table><tr><th>Área</th><th>Área (ha)</th><th>Variedade</th><th>Sementes (kg)</th><th>Sacas 60 kg</th></tr>'+linhas+'<tr><th colspan="3">TOTAL</th><th>'+total.toLocaleString('pt-BR')+' kg</th><th>'+(total/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</th></tr></table><div class="actions no-print"><button class="btn pri" onclick="window.print()">Imprimir</button></div></div>';}
+              f='''function relatorioGeralSementes(){let total=db.safras.reduce((t,v)=>t+(n(v.sementeTotalKg)||(n(v.sementeKgHa)*n(lav(v.lavouraId)?.area))),0);$('relGeralSementes').innerHTML='<div class="card"><h2 style="text-align:center">RELATÓRIO GERAL DE SEMENTES</h2><div class="summary"><b>QUANTIDADE TOTAL DE SEMENTES: '+total.toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg</b><br><b>TOTAL EM SACAS DE 60 KG: '+(total/60).toLocaleString('pt-BR',{maximumFractionDigits:2})+' sacas</b></div><div class="actions no-print"><button class="btn pri" onclick="window.print()">Imprimir</button></div></div>';}
 '''
               marker='function gerarRelatorio()'
               if marker not in s: raise SystemExit('funcao gerarRelatorio nao encontrada')
@@ -35,3 +35,4 @@ jobs:
           git add index.html
           git diff --cached --quiet || git commit -m 'Inclui relatorio geral de sementes [skip ci]'
           git push
+# executar agora
