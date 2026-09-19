@@ -192,12 +192,29 @@ function resumoManejosAreas(){let tipos=[...new Set([...db.manejos.map(x=>x.tipo
   }
   auth.onAuthStateChanged(async user=>{
     if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='flex';document.getElementById('fbUserBar').style.display='none';return;}
-    try{await carregar(user);}catch(e){console.error(e);document.getElementById('fbErro').textContent='Não foi possível conectar ao banco. Verifique a internet e tente novamente.';}
+    try{await carregar(user);}catch(e){
+      console.error(e);
+      const c=e&&e.code?String(e.code):'';
+      let m='Não foi possível conectar ao banco.';
+      if(c.includes('unauthorized-domain'))m='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
+      else if(c.includes('api-key'))m='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
+      else if(c.includes('permission-denied'))m='ACESSO NEGADO PELAS REGRAS DO BANCO FIREBASE.';
+      else if(c.includes('network'))m='FALHA DE REDE AO CONECTAR AO FIREBASE.';
+      document.getElementById('fbErro').textContent=m;
+    }
   });
   document.getElementById('fbLoginForm').addEventListener('submit',async e=>{
     e.preventDefault();const erro=document.getElementById('fbErro');erro.textContent='Conectando...';
     try{await auth.signInWithEmailAndPassword(document.getElementById('fbEmail').value.trim(),document.getElementById('fbSenha').value);erro.textContent='';}
-    catch(x){erro.textContent='E-mail ou senha incorretos.';}
+    catch(x){
+      console.error('Firebase login',x);
+      const c=x&&x.code?String(x.code):'';
+      if(c.includes('unauthorized-domain'))erro.textContent='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
+      else if(c.includes('api-key'))erro.textContent='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
+      else if(c.includes('network'))erro.textContent='FALHA DE REDE AO CONECTAR AO FIREBASE.';
+      else if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))erro.textContent='E-mail ou senha incorretos.';
+      else erro.textContent='ERRO FIREBASE: '+(x.code||x.message||'falha no login');
+    }
   });
   document.getElementById('fbSair').onclick=()=>auth.signOut();
 })();
