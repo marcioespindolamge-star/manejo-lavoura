@@ -169,8 +169,8 @@ function resumoManejosAreas(){let tipos=[...new Set([...db.manejos.map(x=>x.tipo
     currentUser=user;remoteReady=false;
     const ref=docRef();
     let snap;
-    try{snap=await ref.get({source:'server'});}catch(e){console.warn('Firebase servidor indisponível, tentando cache',e);snap=await ref.get({source:'cache'});}
-    if(snap.exists&&snap.data()&&snap.data().db){
+    try{snap=await ref.get();}catch(e){console.error('Firebase leitura',e);throw e;}
+    if(snap&&snap.exists&&snap.data()&&snap.data().db){
       const remoto=snap.data().db;
       db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[]},remoto);
       db.manejos=db.manejos||[];
