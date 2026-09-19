@@ -195,7 +195,7 @@ function resumoManejosAreas(){let tipos=[...new Set([...db.manejos.map(x=>x.tipo
     try{await carregar(user);}catch(e){
       console.error(e);
       const c=e&&e.code?String(e.code):'';
-      let m='Não foi possível conectar ao banco.';
+      let m='ERRO AO ABRIR O BANCO: '+(c||e.message||'DESCONHECIDO');
       if(c.includes('unauthorized-domain'))m='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
       else if(c.includes('api-key'))m='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
       else if(c.includes('permission-denied'))m='ACESSO NEGADO PELAS REGRAS DO BANCO FIREBASE.';
