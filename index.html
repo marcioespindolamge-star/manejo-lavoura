@@ -168,7 +168,8 @@ function resumoManejosAreas(){let tipos=[...new Set([...db.manejos.map(x=>x.tipo
   async function carregar(user){
     currentUser=user;remoteReady=false;
     const ref=docRef();
-    const snap=await ref.get();
+    let snap;
+    try{snap=await ref.get({source:'server'});}catch(e){console.warn('Firebase servidor indisponível, tentando cache',e);snap=await ref.get({source:'cache'});}
     if(snap.exists&&snap.data()&&snap.data().db){
       const remoto=snap.data().db;
       db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[]},remoto);
@@ -191,7 +192,7 @@ function resumoManejosAreas(){let tipos=[...new Set([...db.manejos.map(x=>x.tipo
   }
   auth.onAuthStateChanged(async user=>{
     if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='flex';document.getElementById('fbUserBar').style.display='none';return;}
-    try{await carregar(user);}catch(e){document.getElementById('fbErro').textContent='Não foi possível conectar ao banco. Tente novamente.';console.error(e);}
+    try{await carregar(user);}catch(e){console.error(e);document.getElementById('fbErro').textContent='Não foi possível conectar ao banco. Verifique a internet e tente novamente.';}
   });
   document.getElementById('fbLoginForm').addEventListener('submit',async e=>{
     e.preventDefault();const erro=document.getElementById('fbErro');erro.textContent='Conectando...';
