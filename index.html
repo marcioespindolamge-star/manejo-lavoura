@@ -170,6 +170,7 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
       <label>E-mail</label><input id="fbEmail" type="email" autocomplete="username" required>
       <label>Senha</label><input id="fbSenha" type="password" autocomplete="current-password" required>
       <button class="btn pri" style="width:100%" type="submit">Entrar</button>
+      <button class="btn" style="width:100%;margin-top:7px" type="button" id="fbEsqueciSenha">Esqueci minha senha</button>
       <div id="fbErro" class="fberr"></div>
     </form>
   </div>
@@ -260,6 +261,24 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
       else erro.textContent='ERRO FIREBASE: '+(x.code||x.message||'falha no login');
     }
   });
+  document.getElementById('fbEsqueciSenha').onclick=async()=>{
+    const erro=document.getElementById('fbErro'),email=document.getElementById('fbEmail').value.trim();
+    if(!email){erro.textContent='Digite seu e-mail acima para redefinir a senha.';document.getElementById('fbEmail').focus();return;}
+    erro.textContent='Enviando...';
+    try{
+      await auth.sendPasswordResetEmail(email);
+      erro.style.color='#0f5a3b';
+      erro.textContent='E-mail enviado. Abra sua caixa de entrada para criar uma nova senha.';
+    }catch(x){
+      console.error('Firebase reset',x);
+      erro.style.color='#b3261e';
+      const c=x&&x.code?String(x.code):'';
+      if(c.includes('invalid-email'))erro.textContent='E-mail inválido.';
+      else if(c.includes('user-not-found'))erro.textContent='Não existe usuário cadastrado com este e-mail.';
+      else if(c.includes('network'))erro.textContent='Falha de rede. Tente novamente.';
+      else erro.textContent='Não foi possível enviar o e-mail de recuperação.';
+    }
+  };
   document.getElementById('fbSair').onclick=()=>auth.signOut();
 })();
 </script>
