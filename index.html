@@ -203,6 +203,8 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
   };
   firebase.initializeApp(firebaseConfig);
   const auth=firebase.auth();
+  // Mantém o usuário conectado neste aparelho até ele clicar em SAIR.
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.error('Firebase persistence',e));
   const fire=firebase.firestore();
   fire.enablePersistence({synchronizeTabs:true}).catch(()=>{});
   let currentUser=null, remoteReady=false, writing=false;
