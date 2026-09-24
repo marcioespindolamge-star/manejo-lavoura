@@ -25,6 +25,16 @@
   .btn{font-size:9px;padding:5px 7px;min-height:30px}
   .r2{grid-template-columns:1fr}
 }
+
+/* MENU_SUPERIOR_20260924 */
+.layout{display:block;min-height:calc(100vh - 96px)}
+nav{background:linear-gradient(90deg,#0e5a3b,#0b4c33);padding:7px 18px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;overflow:visible;position:sticky;top:0;z-index:20}
+nav button{padding:10px 22px;text-align:center;min-width:130px}
+nav button.active{box-shadow:inset 0 -4px var(--y)}
+.nav-logo{display:none!important}
+main{padding:22px 26px}
+@media(max-width:1050px){.layout{display:block;min-height:calc(100vh - 86px)}nav{padding:6px 12px}nav button{padding:9px 16px;min-width:115px}}
+@media(max-width:760px){.layout{display:block;min-height:calc(100vh - 48px)}nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:4px}nav button{min-width:0;width:100%;padding:7px 2px;font-size:8px}}
 </style>
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=20260913-3">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=20260913-3">
