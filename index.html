@@ -178,7 +178,7 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
     <h2>GASTOS DA LAVOURA</h2><p>Entre para acessar os dados da Agropecuária Paineira</p>
     <form id="fbLoginForm">
       <label>E-mail</label><input id="fbEmail" type="email" autocomplete="username" required>
-      <label>Senha</label><input id="fbSenha" type="password" autocomplete="current-password" required>
+      <label>Senha</label><div style="position:relative"><input id="fbSenha" type="password" autocomplete="current-password" required style="padding-right:52px"><button type="button" id="fbVerSenha" aria-label="Mostrar senha" title="Mostrar senha" style="position:absolute;right:7px;top:7px;border:0;background:transparent;font-size:20px;cursor:pointer;padding:4px 6px">👁️</button></div>
       <button class="btn pri" style="width:100%" type="submit">Entrar</button>
       <button class="btn" style="width:100%;margin-top:7px" type="button" id="fbEsqueciSenha">Esqueci minha senha</button>
       <div id="fbErro" class="fberr"></div>
@@ -273,7 +273,15 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
       else erro.textContent='ERRO FIREBASE: '+(x.code||x.message||'falha no login');
     }
   });
-  document.getElementById('fbEsqueciSenha').onclick=async()=>{
+  document.getElementById('fbVerSenha').onclick=()=>{
+  const s=document.getElementById('fbSenha'),b=document.getElementById('fbVerSenha');
+  const mostrar=s.type==='password';
+  s.type=mostrar?'text':'password';
+  b.textContent=mostrar?'🙈':'👁️';
+  b.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');
+  b.title=mostrar?'Ocultar senha':'Mostrar senha';
+};
+document.getElementById('fbEsqueciSenha').onclick=async()=>{
     const erro=document.getElementById('fbErro'),email=document.getElementById('fbEmail').value.trim();
     if(!email){erro.textContent='Digite seu e-mail acima para redefinir a senha.';document.getElementById('fbEmail').focus();return;}
     erro.textContent='Enviando...';
