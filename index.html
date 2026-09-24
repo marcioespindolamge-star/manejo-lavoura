@@ -269,8 +269,12 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
       if(c.includes('unauthorized-domain'))erro.textContent='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
       else if(c.includes('api-key'))erro.textContent='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
       else if(c.includes('network'))erro.textContent='FALHA DE REDE AO CONECTAR AO FIREBASE.';
-      else if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))erro.textContent='E-mail ou senha incorretos.';
-      else erro.textContent='ERRO FIREBASE: '+(x.code||x.message||'falha no login');
+      else if(c.includes('invalid-email'))erro.textContent='E-MAIL INVÁLIDO. CONFIRA O ENDEREÇO DIGITADO.';
+      else if(c.includes('user-disabled'))erro.textContent='ESTE USUÁRIO ESTÁ DESATIVADO NO FIREBASE.';
+      else if(c.includes('too-many-requests'))erro.textContent='MUITAS TENTATIVAS. O FIREBASE BLOQUEOU TEMPORARIAMENTE NOVOS LOGINS.';
+      else if(c.includes('operation-not-allowed'))erro.textContent='LOGIN POR E-MAIL/SENHA NÃO ESTÁ HABILITADO NO FIREBASE.';
+      else if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))erro.textContent='O FIREBASE RECUSOU AS CREDENCIAIS ('+(x.code||'SEM CÓDIGO')+'). CONFIRA O E-MAIL E A SENHA; SE ESTIVEREM CORRETOS, VERIFIQUE O USUÁRIO NO FIREBASE AUTHENTICATION.';
+      else erro.textContent='ERRO FIREBASE: '+(x.code||'SEM CÓDIGO')+' — '+(x.message||'falha no login');
     }
   });
   document.getElementById('fbVerSenha').onclick=()=>{
