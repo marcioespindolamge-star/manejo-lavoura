@@ -26,6 +26,27 @@
   .r2{grid-template-columns:1fr}
 }
 
+/* INTERFACE_GASTOS_20260925 */
+#produtos{max-width:1400px;margin:0 auto}
+#produtos>div:first-child{background:linear-gradient(135deg,#164d32,#0e5a3b);color:#fff;padding:16px 18px;border-radius:14px;box-shadow:0 5px 16px #1232}
+#produtos>div:first-child .muted{color:#e9f4ed}
+#resumoGastos{background:#fff8df!important;border:2px solid #e6b94c!important;color:#5a4210!important;border-radius:12px!important;padding:13px 16px!important}
+#produtos .grid{display:grid;grid-template-columns:minmax(320px,430px) minmax(0,1fr);gap:16px;align-items:start}
+#produtos .card{border-radius:14px;box-shadow:0 4px 14px #16352616;border:1px solid #dbe7df}
+#produtos .card.s4,#produtos .card.s8{grid-column:auto!important;width:auto!important}
+#produtos .card.s4{position:sticky;top:62px}
+#produtos .subhead{background:#edf5ef;border-left:5px solid #1c6b45;padding:9px 11px;border-radius:7px;color:#164d32}
+#produtos label{font-weight:700;color:#385145;margin-top:8px}
+#produtos input,#produtos select{border:1px solid #b9c9bf;border-radius:8px;min-height:40px}
+#produtos .actions{margin-top:12px}
+#produtos #btnSalvarEntrada{width:100%;min-height:43px;font-weight:800}
+#produtos #tblPro,#produtos #tblCompras{overflow:auto;border-radius:8px}
+#produtos table{font-size:12px}
+#produtos th{position:sticky;top:0;background:#e5f0e8;z-index:1}
+#produtos td,#produtos th{padding:7px 8px}
+@media(max-width:900px){#produtos .grid{grid-template-columns:1fr}#produtos .card.s4{position:static}#produtos>div:first-child{padding:12px}#produtos table{font-size:11px}}
+@media(max-width:600px){#produtos{padding:0!important}#produtos .grid{gap:10px}#produtos .card{padding:11px!important;border-radius:10px}#produtos>div:first-child{border-radius:10px;flex-wrap:wrap}#produtos>div:first-child h2{font-size:18px}#resumoGastos{font-size:14px!important;margin-bottom:10px!important}#produtos .r2{grid-template-columns:1fr 1fr}#produtos input,#produtos select{min-height:38px;padding:7px}#produtos td,#produtos th{padding:6px;font-size:10px}}
+
 /* MENU_SUPERIOR_20260924 */
 .layout{display:block;min-height:calc(100vh - 96px)}
 nav{background:linear-gradient(90deg,#0e5a3b,#0b4c33);padding:7px 18px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;overflow:visible;position:sticky;top:0;z-index:20}
