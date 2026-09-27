@@ -342,7 +342,7 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
     },e=>console.error('Firebase sync',e));
   }
   auth.onAuthStateChanged(async user=>{
-    if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='none';document.getElementById('fbUserBar').style.display='none';return;}
+    if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='flex';document.getElementById('fbUserBar').style.display='none';return;}
     try{await carregar(user);}catch(e){
       console.error(e);
       const c=e&&e.code?String(e.code):'';
