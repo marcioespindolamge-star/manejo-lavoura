@@ -267,15 +267,12 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
 #fbUserBar button{margin-left:7px;border:0;background:#0f5a3b;color:#fff;border-radius:6px;padding:5px 8px;font-weight:700;cursor:pointer}
 </style>
 <script>
-/* SEM_LOGIN_20260927 — uso direto no aparelho, sem autenticação */
+/* SEM_LOGIN_20260927 — login removido sem interferir nas funções do sistema */
 (function(){
-  const gravaLocal=function(){
-    const j=JSON.stringify(db);
-    if(window.desktopStore&&window.desktopStore.save)window.desktopStore.save(j);
-    else localStorage.setItem(KEY,j);
-  };
-  save=function(){gravaLocal();render();};
-  render();
+  try{
+    var login=document.getElementById('fbLogin');if(login)login.remove();
+    var bar=document.getElementById('fbUserBar');if(bar)bar.remove();
+  }catch(e){console.error(e)}
 })();
 </script>
 <script src="./relatorio-geral-sementes.js?v=20260917"></script></body></html>
