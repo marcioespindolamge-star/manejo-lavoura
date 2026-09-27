@@ -239,6 +239,19 @@ main{padding:22px 26px}
  #acerto #tblAcerto .gasto-row.acoes-abertas .gasto-acoes{display:flex!important}
  #acerto #tblAcerto .gasto-row .gasto-acoes .btn{display:block!important;flex:1!important;width:auto!important;height:34px!important;min-height:34px!important;margin:0!important;padding:5px 8px!important;font-size:11px!important}
 }
+/* CORRECAO_LISTA_COMPACTA_ACERTO_20260927 */
+@media(max-width:600px){
+ #acerto #tblAcerto{width:100%!important;max-width:100%!important;overflow:hidden!important}
+ #acerto #tblAcerto table,#acerto #tblAcerto tbody{display:block!important;width:100%!important;max-width:100%!important}
+ #acerto #tblAcerto .gasto-row{display:grid!important;grid-template-columns:26% 44% 30%!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;border-bottom:1px solid #dfe7e1!important;overflow:hidden!important}
+ #acerto #tblAcerto .gasto-row td{min-width:0!important;max-width:100%!important;box-sizing:border-box!important;padding:8px 4px!important;font-size:10px!important;overflow:hidden!important}
+ #acerto #tblAcerto .gasto-row td:nth-child(1){grid-column:1!important;white-space:nowrap!important}
+ #acerto #tblAcerto .gasto-row td:nth-child(2){grid-column:2!important;white-space:nowrap!important;text-overflow:ellipsis!important}
+ #acerto #tblAcerto .gasto-row td:nth-child(3){grid-column:3!important;white-space:nowrap!important;text-align:right!important;font-weight:700!important}
+ #acerto #tblAcerto .gasto-row .gasto-acoes{grid-column:1 / -1!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:5px 4px 8px!important;overflow:hidden!important}
+ #acerto #tblAcerto .gasto-row.acoes-abertas .gasto-acoes{display:flex!important}
+ #acerto #tblAcerto .gasto-acoes .btn{flex:1 1 0!important;min-width:0!important;max-width:50%!important;width:auto!important;box-sizing:border-box!important;margin:0!important}
+}
 </style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
