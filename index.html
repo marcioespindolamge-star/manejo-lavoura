@@ -259,30 +259,144 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
 </script>
 
 <style>
-#fbLogin{position:fixed;inset:0;z-index:9999;background:#f3f7f4;display:flex;align-items:center;justify-content:center;padding:20px}
+#fbLogin{position:fixed;inset:0;z-index:9999;background:#f3f7f4;display:none;align-items:center;justify-content:center;padding:20px}
 #fbLogin .fbbox{width:min(390px,100%);background:#fff;border:1px solid #d9e3dc;border-radius:16px;padding:24px;box-shadow:0 12px 35px #173b2820}
 #fbLogin h2{margin:0 0 6px;color:#0f5a3b;text-align:center}#fbLogin p{text-align:center;color:#6b7870;font-size:13px;margin:0 0 18px}
 #fbLogin .fberr{color:#b3261e;font-size:12px;min-height:18px;margin-top:8px;text-align:center}
 #fbUserBar{position:fixed;right:10px;bottom:10px;z-index:100;background:#fff;border:1px solid #d9e3dc;border-radius:9px;padding:6px 8px;font-size:11px;box-shadow:0 3px 12px #0002;display:none}
 #fbUserBar button{margin-left:7px;border:0;background:#0f5a3b;color:#fff;border-radius:6px;padding:5px 8px;font-weight:700;cursor:pointer}
 </style>
+<div id="fbLogin">
+  <div class="fbbox">
+    <h2>GASTOS DA LAVOURA</h2><p>Entre para acessar os dados da Agropecuária Paineira</p>
+    <form id="fbLoginForm">
+      <label>E-mail</label><input id="fbEmail" type="email" autocomplete="username" required>
+      <label>Senha</label><div style="position:relative"><input id="fbSenha" type="password" autocomplete="current-password" required style="padding-right:52px"><button type="button" id="fbVerSenha" aria-label="Mostrar senha" title="Mostrar senha" style="position:absolute;right:7px;top:7px;border:0;background:transparent;font-size:20px;cursor:pointer;padding:4px 6px">👁️</button></div>
+      <button class="btn pri" style="width:100%" type="submit">Entrar</button>
+      <button class="btn" style="width:100%;margin-top:7px" type="button" id="fbEsqueciSenha">Esqueci minha senha</button>
+      <div id="fbErro" class="fberr"></div>
+    </form>
+  </div>
+</div>
+<div id="fbUserBar"><span id="fbStatus">Firebase conectado</span><button type="button" id="fbSair">Sair</button></div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-/* FIREBASE_SYNC_SEM_TELA_LOGIN_20260927 */
+/* FIREBASE_SYNC_V1 */
 (function(){
- const firebaseConfig={apiKey:'AIzaSyDVFr9KjXJoITEHAssQLQ2wjm8lxhYIZzk',authDomain:'manejo-lavoura.firebaseapp.com',projectId:'manejo-lavoura',storageBucket:'manejo-lavoura.firebasestorage.app',messagingSenderId:'1005204918003',appId:'1:1005204918003:web:85a768bacdfbfa8548b186',measurementId:'G-8XQ0Q0T6MZ'};
- firebase.initializeApp(firebaseConfig);
- const auth=firebase.auth(),fire=firebase.firestore();fire.enablePersistence({synchronizeTabs:true}).catch(()=>{});
- let currentUser=null,remoteReady=false,writing=false;
- function initArrays(){db.manejos=db.manejos||[];db.acertos=db.acertos||[];db.acertosRealizados=db.acertosRealizados||[]}
- function gravaLocal(){let j=JSON.stringify(db);if(window.desktopStore&&window.desktopStore.save)window.desktopStore.save(j);else localStorage.setItem(KEY,j)}
- function docRef(){return fire.collection('usuarios').doc(currentUser.uid).collection('dados').doc('manejo-lavoura')}
- async function gravaNuvem(){if(!currentUser||!remoteReady||writing)return;writing=true;try{await docRef().set({db:JSON.parse(JSON.stringify(db)),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('Firebase save',e)}finally{writing=false}}
- save=function(){gravaLocal();render();gravaNuvem()};
- async function carregar(user){currentUser=user;remoteReady=false;let ref=docRef(),snap=await ref.get();if(snap.exists&&snap.data()&&snap.data().db){db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[],acertos:[],acertosRealizados:[]},snap.data().db);initArrays();gravaLocal();render()}else await ref.set({db:JSON.parse(JSON.stringify(db)),criadoEm:firebase.firestore.FieldValue.serverTimestamp(),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()});remoteReady=true;ref.onSnapshot(s=>{if(!remoteReady||writing||!s.exists||!s.data().db)return;let novo=s.data().db;if(JSON.stringify(novo)===JSON.stringify(db))return;db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[],acertos:[],acertosRealizados:[]},novo);initArrays();gravaLocal();render()},e=>console.error('Firebase sync',e))}
- auth.onAuthStateChanged(async user=>{if(user){try{await carregar(user)}catch(e){console.error('Firebase leitura',e)}return}try{let cred=localStorage.getItem('paineira_firebase_cred');if(cred){cred=JSON.parse(cred);await auth.signInWithEmailAndPassword(cred.email,cred.password)}else{console.warn('Firebase: sessão não autenticada; mantendo dados locais até a sessão existente ser recuperada.')}}catch(e){console.error('Firebase auth',e)}});
+  const firebaseConfig={
+    apiKey:'AIzaSyDVFr9KjXJoITEHAssQLQ2wjm8lxhYIZzk',
+    authDomain:'manejo-lavoura.firebaseapp.com',
+    projectId:'manejo-lavoura',
+    storageBucket:'manejo-lavoura.firebasestorage.app',
+    messagingSenderId:'1005204918003',
+    appId:'1:1005204918003:web:85a768bacdfbfa8548b186',
+    measurementId:'G-8XQ0Q0T6MZ'
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth=firebase.auth();
+  // Mantém o usuário conectado neste aparelho até ele clicar em SAIR.
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.error('Firebase persistence',e));
+  const fire=firebase.firestore();
+  fire.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  let currentUser=null, remoteReady=false, writing=false;
+  const localSave=save;
+  const docRef=()=>fire.collection('usuarios').doc(currentUser.uid).collection('dados').doc('manejo-lavoura');
+  function gravaLocal(){
+    const j=JSON.stringify(db);
+    if(window.desktopStore&&window.desktopStore.save)window.desktopStore.save(j);else localStorage.setItem(KEY,j);
+  }
+  async function gravaNuvem(){
+    if(!currentUser||!remoteReady||writing)return;
+    writing=true;
+    try{await docRef().set({db:JSON.parse(JSON.stringify(db)),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}
+    catch(e){console.error('Firebase save',e);}
+    finally{writing=false;}
+  }
+  save=function(){gravaLocal();render();gravaNuvem();};
+  async function carregar(user){
+    currentUser=user;remoteReady=false;
+    const ref=docRef();
+    let snap;
+    try{snap=await ref.get();}catch(e){console.error('Firebase leitura',e);throw e;}
+    if(snap&&snap.exists&&snap.data()&&snap.data().db){
+      const remoto=snap.data().db;
+      db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[]},remoto);
+      db.manejos=db.manejos||[];db.acertos=db.acertos||[];db.acertosRealizados=db.acertosRealizados||[];
+      gravaLocal();render();
+    }else{
+      await ref.set({db:JSON.parse(JSON.stringify(db)),criadoEm:firebase.firestore.FieldValue.serverTimestamp(),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+    remoteReady=true;
+    document.getElementById('fbLogin').style.display='none';
+    document.getElementById('fbUserBar').style.display='block';
+    document.getElementById('fbStatus').textContent='Sincronizado';
+    ref.onSnapshot(s=>{
+      if(!remoteReady||writing||!s.exists||!s.data().db)return;
+      const novo=s.data().db;
+      if(JSON.stringify(novo)===JSON.stringify(db))return;
+      db=Object.assign({lavouras:[],safras:[],produtos:[],compras:[],aplicacoes:[],manejos:[]},novo);
+      db.manejos=db.manejos||[];gravaLocal();render();
+    },e=>console.error('Firebase sync',e));
+  }
+  auth.onAuthStateChanged(async user=>{
+    if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='none';document.getElementById('fbUserBar').style.display='none';return;}
+    try{await carregar(user);}catch(e){
+      console.error(e);
+      const c=e&&e.code?String(e.code):'';
+      let m='ERRO AO ABRIR O BANCO: '+(c||e.message||'DESCONHECIDO');
+      if(c.includes('unauthorized-domain'))m='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
+      else if(c.includes('api-key'))m='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
+      else if(c.includes('permission-denied'))m='ACESSO NEGADO PELAS REGRAS DO BANCO FIREBASE.';
+      else if(c.includes('network'))m='FALHA DE REDE AO CONECTAR AO FIREBASE.';
+      document.getElementById('fbErro').textContent=m;
+    }
+  });
+  document.getElementById('fbLoginForm').addEventListener('submit',async e=>{
+    e.preventDefault();const erro=document.getElementById('fbErro');erro.textContent='Conectando...';
+    try{await auth.signInWithEmailAndPassword(document.getElementById('fbEmail').value.trim(),document.getElementById('fbSenha').value);erro.textContent='';}
+    catch(x){
+      console.error('Firebase login',x);
+      const c=x&&x.code?String(x.code):'';
+      if(c.includes('unauthorized-domain'))erro.textContent='DOMÍNIO NÃO AUTORIZADO NO FIREBASE: '+location.hostname;
+      else if(c.includes('api-key'))erro.textContent='CHAVE DO FIREBASE INVÁLIDA OU BLOQUEADA.';
+      else if(c.includes('network'))erro.textContent='FALHA DE REDE AO CONECTAR AO FIREBASE.';
+      else if(c.includes('invalid-email'))erro.textContent='E-MAIL INVÁLIDO. CONFIRA O ENDEREÇO DIGITADO.';
+      else if(c.includes('user-disabled'))erro.textContent='ESTE USUÁRIO ESTÁ DESATIVADO NO FIREBASE.';
+      else if(c.includes('too-many-requests'))erro.textContent='MUITAS TENTATIVAS. O FIREBASE BLOQUEOU TEMPORARIAMENTE NOVOS LOGINS.';
+      else if(c.includes('operation-not-allowed'))erro.textContent='LOGIN POR E-MAIL/SENHA NÃO ESTÁ HABILITADO NO FIREBASE.';
+      else if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))erro.textContent='O FIREBASE RECUSOU AS CREDENCIAIS ('+(x.code||'SEM CÓDIGO')+'). CONFIRA O E-MAIL E A SENHA; SE ESTIVEREM CORRETOS, VERIFIQUE O USUÁRIO NO FIREBASE AUTHENTICATION.';
+      else erro.textContent='ERRO FIREBASE: '+(x.code||'SEM CÓDIGO')+' — '+(x.message||'falha no login');
+    }
+  });
+  document.getElementById('fbVerSenha').onclick=()=>{
+  const s=document.getElementById('fbSenha'),b=document.getElementById('fbVerSenha');
+  const mostrar=s.type==='password';
+  s.type=mostrar?'text':'password';
+  b.textContent=mostrar?'🙈':'👁️';
+  b.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');
+  b.title=mostrar?'Ocultar senha':'Mostrar senha';
+};
+document.getElementById('fbEsqueciSenha').onclick=async()=>{
+    const erro=document.getElementById('fbErro'),email=document.getElementById('fbEmail').value.trim();
+    if(!email){erro.textContent='Digite seu e-mail acima para redefinir a senha.';document.getElementById('fbEmail').focus();return;}
+    erro.textContent='Enviando...';
+    try{
+      await auth.sendPasswordResetEmail(email);
+      erro.style.color='#0f5a3b';
+      erro.textContent='E-mail enviado. Abra sua caixa de entrada para criar uma nova senha.';
+    }catch(x){
+      console.error('Firebase reset',x);
+      erro.style.color='#b3261e';
+      const c=x&&x.code?String(x.code):'';
+      if(c.includes('invalid-email'))erro.textContent='E-mail inválido.';
+      else if(c.includes('user-not-found'))erro.textContent='Não existe usuário cadastrado com este e-mail.';
+      else if(c.includes('network'))erro.textContent='Falha de rede. Tente novamente.';
+      else erro.textContent='Não foi possível enviar o e-mail de recuperação.';
+    }
+  };
+  document.getElementById('fbSair').onclick=()=>auth.signOut();
 })();
 </script>
 <script src="./relatorio-geral-sementes.js?v=20260917"></script></body></html>
