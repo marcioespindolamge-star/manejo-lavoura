@@ -300,6 +300,19 @@ main{padding:22px 26px}
  #acerto .gasto-mobile-linha span,#acerto .gasto-mobile-linha strong{font-size:10px;padding:0 3px;box-sizing:border-box}
  #acerto .gasto-acoes .btn{width:52px;height:25px;min-height:25px;font-size:8px}
 }
+/* FIX_VISIBILIDADE_GASTOS_20260927 */
+@media(max-width:600px){
+ #acerto .gastos-mobile-lista{display:block!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
+ #acerto .gasto-mobile{display:block!important;width:100%!important;max-width:100%!important;padding:8px 4px!important;margin:0!important;box-sizing:border-box!important;border-bottom:1px solid #dfe7e1!important;background:#fff!important;overflow:hidden!important}
+ #acerto .gasto-mobile-linha{display:grid!important;grid-template-columns:25% 45% 30%!important;width:100%!important;max-width:100%!important;min-width:0!important;gap:0!important;align-items:center!important;box-sizing:border-box!important}
+ #acerto .gasto-mobile-linha span,#acerto .gasto-mobile-linha strong{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;padding:0 3px!important;margin:0!important;box-sizing:border-box!important;font-size:10px!important;line-height:1.25!important;color:#24342b!important;opacity:1!important;visibility:visible!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ #acerto .gasto-mobile-linha span:nth-child(1){text-align:left!important}
+ #acerto .gasto-mobile-linha span:nth-child(2){text-align:left!important}
+ #acerto .gasto-mobile-linha strong{text-align:right!important;font-weight:800!important}
+ #acerto .gasto-mobile .gasto-acoes{display:none!important;width:100%!important;box-sizing:border-box!important;margin:6px 0 0!important;padding:0!important;justify-content:flex-end!important;gap:5px!important}
+ #acerto .gasto-mobile.acoes-abertas .gasto-acoes{display:flex!important}
+ #acerto .gasto-mobile .gasto-acoes .btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:52px!important;min-width:52px!important;max-width:52px!important;height:25px!important;min-height:25px!important;padding:2px!important;margin:0!important;font-size:8px!important}
+}
 </style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
