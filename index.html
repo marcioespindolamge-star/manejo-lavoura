@@ -178,6 +178,18 @@ main{padding:22px 26px}
  #acerto #tblAcerto th:nth-child(4),#acerto #tblAcerto td:nth-child(4){width:31%}
  #acerto #tblAcerto td:nth-child(4) .btn{padding:6px 5px;font-size:10px;margin:1px}
 }
+/* CORRECAO_ACOES_GASTOS_MOBILE_20260927 */
+@media(max-width:600px){
+ #acerto #tblAcerto{width:100%;overflow:visible}
+ #acerto #tblAcerto table{width:100%;table-layout:fixed;font-size:10px}
+ #acerto #tblAcerto th,#acerto #tblAcerto td{padding:5px 3px}
+ #acerto #tblAcerto th:nth-child(1),#acerto #tblAcerto td:nth-child(1){width:19%;white-space:nowrap}
+ #acerto #tblAcerto th:nth-child(2),#acerto #tblAcerto td:nth-child(2){width:27%;overflow-wrap:anywhere}
+ #acerto #tblAcerto th:nth-child(3),#acerto #tblAcerto td:nth-child(3){width:20%;white-space:nowrap}
+ #acerto #tblAcerto th:nth-child(4),#acerto #tblAcerto td:nth-child(4){width:34%;white-space:normal!important}
+ #acerto #tblAcerto td:nth-child(4){display:flex;gap:3px;align-items:center}
+ #acerto #tblAcerto td:nth-child(4) .btn{flex:1;min-width:0;width:auto;height:34px;padding:4px 2px!important;font-size:9px!important;line-height:1}
+}
 </style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
