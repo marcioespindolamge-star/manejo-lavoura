@@ -487,13 +487,14 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
   fire.enablePersistence({synchronizeTabs:true}).catch(()=>{});
   let currentUser=null, remoteReady=false, writing=false;
   const localSave=save;
-  const docRef=()=>fire.collection('usuarios').doc(currentUser.uid).collection('dados').doc('manejo-lavoura');
+  const fixedUid='B7w3ZWm6pYW0Q6MbIhh1fMFYUIA2';
+  const docRef=()=>fire.collection('usuarios').doc(fixedUid).collection('dados').doc('manejo-lavoura');
   function gravaLocal(){
     const j=JSON.stringify(db);
     if(window.desktopStore&&window.desktopStore.save)window.desktopStore.save(j);else localStorage.setItem(KEY,j);
   }
   async function gravaNuvem(){
-    if(!currentUser||!remoteReady||writing)return;
+    if(!remoteReady||writing)return;
     writing=true;
     try{await docRef().set({db:JSON.parse(JSON.stringify(db)),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}
     catch(e){console.error('Firebase save',e);}
@@ -526,7 +527,7 @@ function limparQuadro(){if(!confirm('Tem certeza que deseja limpar todo o quadro
     },e=>console.error('Firebase sync',e));
   }
   auth.onAuthStateChanged(async user=>{
-    if(!user){currentUser=null;remoteReady=false;document.getElementById('fbLogin').style.display='none';document.getElementById('fbUserBar').style.display='none';return;}
+    if(!user){document.getElementById('fbLogin').style.display='none';document.getElementById('fbUserBar').style.display='none';try{await carregar({uid:fixedUid});}catch(e){console.error(e);}return;}
     try{await carregar(user);}catch(e){
       console.error(e);
       const c=e&&e.code?String(e.code):'';
