@@ -2,7 +2,7 @@
   "name": "Gastos da Lavoura",
   "short_name": "Gastos Lavoura",
   "start_url": "./",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#ffffff",
   "theme_color": "#174d2c",
   "icons": [
