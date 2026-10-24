@@ -330,6 +330,12 @@ main{padding:22px 26px}
 #produtos #tblCompras td:last-child,#produtos #tblCompras th:last-child{min-width:175px;white-space:nowrap}
 #produtos #tblCompras td:last-child .btn{padding:8px 10px}
 @media(max-width:700px){#produtos #painelHistorico,#produtos #painelEstoque{padding:12px}#produtos #tblCompras,#produtos #tblPro{overflow-x:auto}}
+
+/* FIX_HISTORICO_20261024: vence regras antigas com !important */
+#produtos .grid > #painelHistorico,#produtos .grid > #painelEstoque{grid-column:1 / -1 !important;width:100% !important;max-width:none !important;min-width:0 !important}
+#produtos #tblCompras,#produtos #tblPro{overflow-x:auto !important;overflow-y:visible;max-width:100%;-webkit-overflow-scrolling:touch}
+#produtos #tblCompras table{min-width:850px;width:100%}
+#produtos #tblCompras td:last-child{white-space:nowrap;min-width:185px}
 </style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
