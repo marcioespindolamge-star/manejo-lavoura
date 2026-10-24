@@ -322,7 +322,15 @@ main{padding:22px 26px}
 #produtos #painelCompra input,#produtos #painelCompra select{width:100%;max-width:100%;min-width:0}
 @media(max-width:600px){#produtos #painelCompra{width:100%!important;padding:14px!important}#produtos #painelCompra .r2{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#produtos #painelCompra label{font-size:11px}#produtos #painelCompra input,#produtos #painelCompra select{font-size:16px;box-sizing:border-box}#produtos .gastos-tabs{width:100%;max-width:100%}#produtos .gastos-tabs .btn{min-width:0;white-space:normal}}
 @media(max-width:360px){#produtos #painelCompra .r2{grid-template-columns:1fr}}
-@media(max-width:700px){#painelCompra .compra-compacta{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}#painelCompra .compra-compacta>.r2{display:contents}#painelCompra .compra-compacta>div{min-width:0}#painelCompra .compra-compacta input{width:100%;min-width:0;height:42px;min-height:42px;padding:7px 9px;font-size:15px}#painelCompra .compra-compacta label{font-size:12px}#painelCompra #comData{font-size:14px}#painelCompra #fPro>input,#painelCompra #fPro>select{min-height:42px}} </style>
+@media(max-width:700px){#painelCompra .compra-compacta{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}#painelCompra .compra-compacta>.r2{display:contents}#painelCompra .compra-compacta>div{min-width:0}#painelCompra .compra-compacta input{width:100%;min-width:0;height:42px;min-height:42px;padding:7px 9px;font-size:15px}#painelCompra .compra-compacta label{font-size:12px}#painelCompra #comData{font-size:14px}#painelCompra #fPro>input,#painelCompra #fPro>select{min-height:42px}} 
+/* Histórico e estoque ocupam a largura disponível; ações permanecem acessíveis */
+#produtos #painelHistorico,#produtos #painelEstoque{grid-column:1/-1;min-width:0;width:100%}
+#produtos #tblCompras,#produtos #tblPro{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#produtos #tblCompras table,#produtos #tblPro table{width:100%;min-width:760px}
+#produtos #tblCompras td:last-child,#produtos #tblCompras th:last-child{min-width:175px;white-space:nowrap}
+#produtos #tblCompras td:last-child .btn{padding:8px 10px}
+@media(max-width:700px){#produtos #painelHistorico,#produtos #painelEstoque{padding:12px}#produtos #tblCompras,#produtos #tblPro{overflow-x:auto}}
+</style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
