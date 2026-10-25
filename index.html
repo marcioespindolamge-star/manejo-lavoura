@@ -367,6 +367,22 @@ main{padding:22px 26px}
 #produtos #painelCompra .quantidade-embalagens-linha{gap:4px!important}
 #produtos #painelCompra .quantidade-embalagens-total{padding:4px 6px!important;font-size:11px!important}
 @media(max-width:420px){#produtos #painelCompra .compra-compacta{column-gap:6px!important}#produtos #painelCompra .compra-compacta label{font-size:10px!important;line-height:1.2;min-height:24px;display:flex;align-items:end}}
+
+/* ALINHAMENTO_FORMULARIO_MOBILE_20261025 */
+#produtos #painelCompra .compra-compacta{align-items:start!important;row-gap:8px!important}
+#produtos #painelCompra .compra-compacta>div{display:flex;flex-direction:column;min-width:0}
+#produtos #painelCompra .compra-compacta>div>label{height:34px!important;min-height:34px!important;display:flex!important;align-items:flex-end!important;margin:0 0 5px!important;line-height:1.15!important}
+#produtos #painelCompra .compra-compacta>div>input,#produtos #painelCompra .compra-compacta>div>.preco-unitario-linha,#produtos #painelCompra .compra-compacta>div>.quantidade-embalagens-linha{height:42px!important;min-height:42px!important;margin:0!important}
+#produtos #painelCompra .preco-unitario-linha{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:stretch!important}
+#produtos #painelCompra .preco-unitario-linha select,#produtos #painelCompra .preco-unitario-linha input{height:100%!important;min-height:0!important;margin:0!important;min-width:0!important}
+#produtos #painelCompra .quantidade-embalagens-linha{align-items:stretch!important}
+#produtos #painelCompra .quantidade-embalagens-linha input{height:100%!important;min-height:0!important;margin:0!important}
+#produtos #painelCompra .quantidade-embalagens-total{height:100%!important;min-height:0!important}
+#produtos #painelCompra .compra-dose-linha{align-items:start!important}
+#produtos #painelCompra .compra-dose-linha>div{min-width:0}
+#produtos #painelCompra .compra-dose-linha label{height:34px!important;min-height:34px!important;display:flex!important;align-items:flex-end!important;margin:0 0 5px!important;line-height:1.15!important}
+#produtos #painelCompra .compra-dose-linha input{height:42px!important;min-height:42px!important;margin:0!important;width:100%!important}
+@media(min-width:701px){#produtos #painelCompra .compra-compacta>div>input,#produtos #painelCompra .compra-compacta>div>.preco-unitario-linha,#produtos #painelCompra .compra-compacta>div>.quantidade-embalagens-linha,#produtos #painelCompra .compra-dose-linha input{height:34px!important;min-height:34px!important}}
 </style>
 <link rel="apple-touch-icon" href="./gastos-icon.png?v=20260925-1">
 <link rel="icon" type="image/png" href="./gastos-icon.png?v=20260925-1">
