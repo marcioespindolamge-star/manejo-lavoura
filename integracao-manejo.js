@@ -2,7 +2,7 @@
   const ORIGEM='https://marcioespindolamge-star.github.io';
   let registros=new Map(),recebido=false;
   const originalStock=stock;
-  const chave=v=>String(v||'').trim().toUpperCase().replace(/\\s+/g,' ');
+  const chave=v=>String(v||'').trim().toUpperCase().replace(/\s+/g,' ');
   const numero=v=>Number(String(v||'').replace(',','.'));
   function consumo(id){
     const produto=pro(id);
@@ -14,7 +14,7 @@
       (r.produtos||[]).forEach(p=>{
         if(chave(p.produto)!==chave(produto.nome))return;
         const doseTexto=String(p.dose||'').trim();
-        const m=doseTexto.match(/^([0-9]+(?:[.,][0-9]+)?)\\s*(L|KG)$/i);
+        const m=doseTexto.match(/^([0-9]+(?:[.,][0-9]+)?)\s*(L|KG)$/i);
         if(!m||chave(m[2])!==chave(produto.unidade))return;
         const dose=numero(m[1]),area=numero(r.areaHa),quantidade=dose*area;
         if(!Number.isFinite(quantidade)||quantidade<=0)return;
