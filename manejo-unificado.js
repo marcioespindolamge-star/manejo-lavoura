@@ -6,6 +6,23 @@ const norm=v=>String(v||'').trim().toUpperCase().replace(/\s+/g,' ');
 const num=v=>{const m=String(v??'0').replace(',','.').match(/-?[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):0};
 const rows=()=>Array.isArray(db.manejosIntegrados)?db.manejosIntegrados:(db.manejosIntegrados=[]);
 let editing=null,importBusy=false;
+// Nomes e hectares da origem, preservando a identidade da área de cada registro.
+const nomesOriginais=[
+ ['FRENTE 01 - ALEX',16],['FRENTE 02 - ALEX',29],['FRENTE 03 - BELMIRO',26],
+ ['FUNDO 04 - OVELHA',18],['FUNDO 05 - SAIBRO EUCALIPTO',14],
+ ['FUNDO 06 - BERGAMOTEIRA',24],['FUNDO 07 - TAPERA ADÃO',25],
+ ['FUNDO 08 - ÁREA NOVA MATO',22],['FUNDO 09 - MATO',53],['FUNDO 10 - VALDOMIRO',10]
+];
+const chavesOriginais=['frente01','frente02','frente03','fundo04','fundo05','fundo06','fundo07','fundo08','fundo09','fundo10'];
+const indicesLegados=[0,1,2,2,2,3,3,4,5,6,7,8,9];
+function resolverArea(r,areas){
+ const idx=r.areaKey?chavesOriginais.indexOf(r.areaKey):indicesLegados[Number(r.areaIndex)];
+ const porChave=areas.find(a=>a.key===r.areaKey);
+ const base=porChave||(Number.isInteger(idx)&&idx>=0?{nome:nomesOriginais[idx][0],ha:nomesOriginais[idx][1]}:null);
+ return {nome:base?.nome||r.areaNome||'',ha:num(base?.ha)||num(r.areaHa)};
+}
+function areaExibida(r){return esc(r.areaNome||'SEM ÁREA')+' — <b>'+num(r.areaHa).toLocaleString('pt-BR')+' ha</b>'}
+
 const originalStock=stock;
 function descontar(id){
  const p=pro(id);if(!p)return 0;
@@ -74,17 +91,17 @@ async function importar(e){
   if(!app)app=firebase.initializeApp({apiKey:'AIzaSyBREfDuGOG2IwXlzsZaseCSQLGMYTmyZ5A',authDomain:'manejo-celular.firebaseapp.com',projectId:'manejo-celular',appId:'1:88332679453:web:8f8a62078441c02ad7c9f4'},nome);
   const a=app.auth();const user=await a.signInWithEmailAndPassword($('miEmail').value.trim(),$('miSenha').value);
   if(user.user.uid!=='cFbvu67r3DhBptgBLaZfFybtCEf2')throw Error('Esta conta não está autorizada no MANEJO.');
-  const fs=app.firestore();const snap=await fs.collection('manejos').get();
+  const fs=app.firestore();const snap=await fs.collection('manejos').get();const areaSnap=await fs.doc('configuracao_areas/areas').get();const areas=areaSnap.exists&&Array.isArray(areaSnap.data().areas)?areaSnap.data().areas:[];
   let novos=0,existentes=0;const ids=new Set(rows().map(x=>x.id));
   snap.forEach(doc=>{
-   if(ids.has('antigo-'+doc.id)){existentes++;return}
+   if(ids.has('antigo-'+doc.id)){const antigo=rows().find(x=>x.id==='antigo-'+doc.id);if(antigo){const area=resolverArea(doc.data(),areas);antigo.areaNome=area.nome;antigo.areaHa=area.ha;}existentes++;return}
    const r=doc.data(),ps=(r.produtos||[]).map(p=>{const m=String(p.dose||'').match(/^\s*([0-9.,]+)\s*(L|KG)?/i);return {produto:p.produto||'',dose:m?num(m[1]):0,unidade:m?.[2]?.toUpperCase()||'L'}}).filter(p=>p.produto&&p.dose>0);
-   const lav=db.lavouras.find(l=>norm(l.nome)===norm(r.areaNome))||null;
-   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:r.areaNome||'',areaHa:num(r.areaHa)||num(lav?.area),observacao:r.observacao||'',produtos:ps});
+   const area=resolverArea(r,areas);const lav=db.lavouras.find(l=>norm(l.nome)===norm(area.nome))||null;
+   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:area.nome,areaHa:area.ha,observacao:r.observacao||'',produtos:ps});
    novos++;
   });
   save();listar();$('miSenha').value='';
-  status.textContent='Importação concluída: '+novos+' novos; '+existentes+' já existentes. Registros antigos preservados. Confira áreas e estoque.';
+  status.textContent='Conferência concluída: '+novos+' novos; '+existentes+' atualizados/conferidos. Nomes e hectares recuperados do MANEJO original.';
   await a.signOut();
  }catch(err){status.textContent='Importação não concluída: '+(err.code||err.message);console.error('Importação',err)}
  finally{importBusy=false}
