@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=v=>String(v||'').trim().toUpperCase().replace(/\s+/g,' ');
-const num=v=>Number(String(v||'0').replace(',','.'))||0;
+const num=v=>{const m=String(v??'0').replace(',','.').match(/-?[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):0};
 const rows=()=>Array.isArray(db.manejosIntegrados)?db.manejosIntegrados:(db.manejosIntegrados=[]);
 let editing=null,importBusy=false;
 const originalStock=stock;
@@ -80,7 +80,7 @@ async function importar(e){
    if(ids.has('antigo-'+doc.id)){existentes++;return}
    const r=doc.data(),ps=(r.produtos||[]).map(p=>{const m=String(p.dose||'').match(/^\s*([0-9.,]+)\s*(L|KG)?/i);return {produto:p.produto||'',dose:m?num(m[1]):0,unidade:m?.[2]?.toUpperCase()||'L'}}).filter(p=>p.produto&&p.dose>0);
    const lav=db.lavouras.find(l=>norm(l.nome)===norm(r.areaNome))||null;
-   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:r.areaNome||'',areaHa:num(r.areaHa),observacao:r.observacao||'',produtos:ps});
+   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:r.areaNome||'',areaHa:num(r.areaHa)||num(lav?.area),observacao:r.observacao||'',produtos:ps});
    novos++;
   });
   save();listar();$('miSenha').value='';
