@@ -92,15 +92,16 @@ async function importar(e){
   const a=app.auth();const user=await a.signInWithEmailAndPassword($('miEmail').value.trim(),$('miSenha').value);
   if(user.user.uid!=='cFbvu67r3DhBptgBLaZfFybtCEf2')throw Error('Esta conta não está autorizada no MANEJO.');
   const fs=app.firestore();const snap=await fs.collection('manejos').get();const areaSnap=await fs.doc('configuracao_areas/areas').get();const areas=areaSnap.exists&&Array.isArray(areaSnap.data().areas)?areaSnap.data().areas:[];
+  if(areas.length)db.manejoAreas=areas.filter(a=>a&&a.key&&a.nome&&num(a.ha)>0).map(a=>({key:a.key,nome:a.nome,ha:num(a.ha)}));
   let novos=0,existentes=0;const ids=new Set(rows().map(x=>x.id));
   snap.forEach(doc=>{
-   if(ids.has('antigo-'+doc.id)){const antigo=rows().find(x=>x.id==='antigo-'+doc.id);if(antigo){const area=resolverArea(doc.data(),areas);antigo.areaNome=area.nome;antigo.areaHa=area.ha;}existentes++;return}
+   if(ids.has('antigo-'+doc.id)){const antigo=rows().find(x=>x.id==='antigo-'+doc.id);if(antigo){const area=resolverArea(doc.data(),areas);antigo.areaNome=area.nome;antigo.areaHa=area.ha;if(doc.data().areaKey)antigo.areaKey=doc.data().areaKey;}existentes++;return}
    const r=doc.data(),ps=(r.produtos||[]).map(p=>{const m=String(p.dose||'').match(/^\s*([0-9.,]+)\s*(L|KG)?/i);return {produto:p.produto||'',dose:m?num(m[1]):0,unidade:m?.[2]?.toUpperCase()||'L'}}).filter(p=>p.produto&&p.dose>0);
    const area=resolverArea(r,areas);const lav=db.lavouras.find(l=>norm(l.nome)===norm(area.nome))||null;
-   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:area.nome,areaHa:area.ha,observacao:r.observacao||'',produtos:ps});
+   rows().push({id:'antigo-'+doc.id,origem:'manejo-celular',areaKey:r.areaKey||'',dia:r.dia||'',tipo:r.tipo||'Outro',lavouraId:lav?.id||'',areaNome:area.nome,areaHa:area.ha,observacao:r.observacao||'',produtos:ps});
    novos++;
   });
-  save();listar();$('miSenha').value='';
+  save();atualizarCatalogoMI();listar();$('miSenha').value='';
   status.textContent='Conferência concluída: '+novos+' novos; '+existentes+' atualizados/conferidos. Nomes e hectares recuperados do MANEJO original.';
   await a.signOut();
  }catch(err){status.textContent='Importação não concluída: '+(err.code||err.message);console.error('Importação',err)}
