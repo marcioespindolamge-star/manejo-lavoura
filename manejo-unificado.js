@@ -166,6 +166,7 @@ mostrar=function(){
  $('miCaderno').onclick=()=>window.open('https://marcioespindolamge-star.github.io/quadro-manejo/?abrir=caderno','_blank','noopener');
  $('miRelatorio').onclick=relatorioMI;
  $('miVoltar').onclick=voltarManejoIntegrado;
+ $('miVoltar').classList.add('mi-voltar');host.querySelector('.mi-hero').prepend($('miVoltar'));
  $('miAdd').onclick=()=>addProduto({},true);
  $('miCancel').onclick=limpar;
  $('miForm').onsubmit=salvarManejo;
