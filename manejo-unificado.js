@@ -151,7 +151,7 @@ function atualizarCatalogoMI(){
 }
 mostrar=function(){
  const host=$('areaManejoIntegrado');if(!host)return;
- host.innerHTML='<div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
+ host.innerHTML='<div style="padding:10px 12px;background:#f2f6f1"><button class="btn" id="miVoltar">← VOLTAR AO GASTOS</button></div><div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
  '<div class="mi-wrap"><div class="mi-tools"><div class="mi-total">ÁREA TOTAL<strong id="miTotal">—</strong></div><button class="mi-caderno" id="miCaderno">📋 CADERNO DE CAMPO</button></div>'+
  '<div class="mi-panel"><h3>SELECIONE A LAVOURA</h3><div class="mi-picker"><select id="miAreaSelect" aria-label="Selecione a lavoura"></select><button class="mi-areaadd" id="miNovaArea">+ ÁREA</button></div></div>'+
  '<button class="mi-report" id="miRelatorio">📄 RELATÓRIO GERAL</button><div class="mi-reportview" id="miReportView"></div>'+
@@ -160,7 +160,7 @@ mostrar=function(){
  '<div class="r2"><div><label>Tipo de manejo</label><select id="miTipo"><option>Manejo de inverno</option><option>Dessecação</option><option>Plantio</option><option>Adubação</option><option>Capina</option><option>Fungicida</option><option>Herbicida</option><option>Inseticida</option><option>Colheita</option><option>Outro</option></select></div><div><label>Observação</label><input id="miObs"></div></div>'+
  '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
  '<details class="mi-panel" id="miImportBox"><summary style="cursor:pointer;font-weight:800;color:#245d39">IMPORTAR / CONFERIR MANEJOS ANTIGOS</summary><p class="mi-note">Os registros originais não serão apagados. Registros já importados serão reconhecidos pelo ID.</p><form id="miImport"><label>E-mail do MANEJO antigo</label><input id="miEmail" type="email" required autocomplete="username"><label>Senha</label><input id="miSenha" type="password" required autocomplete="current-password"><button class="btn pri" type="submit">CONFERIR REGISTROS</button></form><p id="miImportStatus" role="status"></p></details>'+
- '<div class="mi-bottom"><button class="btn" id="miVoltar">← VOLTAR AO GASTOS</button><span class="mi-note">Sem controle de estoque</span></div></div>';
+ '</div>';
  $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;if($('miFormPanel'))$('miFormPanel').classList.remove('on');listar()};
  $('miNovaArea').onclick=()=>editarAreaMI(true);
  $('miCaderno').onclick=()=>window.open('https://marcioespindolamge-star.github.io/quadro-manejo/?abrir=caderno','_blank','noopener');
