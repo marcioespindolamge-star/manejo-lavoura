@@ -1,0 +1,40 @@
+#areaManejoIntegrado{background:#f2f6f1;color:#193426;padding:0 0 18px}
+#areaManejoIntegrado .mi-hero{background:linear-gradient(125deg,#173f29,#347b4c);color:white;text-align:center;padding:18px 12px 16px;border-bottom:4px solid #8cb979;border-radius:10px 10px 0 0}
+#areaManejoIntegrado .mi-logo{height:60px;width:60px;border:3px solid white;border-radius:50%;object-fit:cover;box-shadow:0 3px 8px #0004}
+#areaManejoIntegrado .mi-hero h2{font-size:clamp(20px,4vw,29px);margin:9px 0 3px;color:white;letter-spacing:.4px}
+#areaManejoIntegrado .mi-hero p{margin:0;color:#e6f2e8;letter-spacing:.7px;font-size:14px}
+#areaManejoIntegrado .mi-wrap{max-width:860px;margin:auto;padding:12px 10px}
+#areaManejoIntegrado .mi-tools{display:grid;grid-template-columns:1fr 1.1fr;gap:12px;align-items:center;margin-bottom:12px}
+#areaManejoIntegrado .mi-total{background:#e5eee7;border:2px solid #b5d2bc;border-left:7px solid #2b6843;border-radius:12px;padding:10px 14px;color:#235b39;font-weight:900;font-size:15px;max-width:245px}
+#areaManejoIntegrado .mi-total strong{display:block;font-size:30px;margin-top:3px}
+#areaManejoIntegrado .mi-caderno{background:#2c6744;color:white;border:0;border-radius:12px;padding:14px 10px;font-weight:900;font-size:15px;min-height:53px}
+#areaManejoIntegrado .mi-panel{background:#fff;border:1px solid #d8e2da;border-radius:13px;padding:14px;margin:10px 0;box-shadow:0 3px 9px #193d2610}
+#areaManejoIntegrado .mi-panel h3{margin:0 0 12px;color:#245d39;font-size:17px;font-weight:900}
+#areaManejoIntegrado .mi-picker{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}
+#areaManejoIntegrado .mi-picker select{font-weight:800;color:#173a28;font-size:16px}
+#areaManejoIntegrado .mi-areaadd{background:#2d6c47;color:white;border:0;border-radius:10px;font-weight:900;padding:0 13px}
+#areaManejoIntegrado .mi-report{display:block;width:100%;padding:14px;background:white;border:0;border-radius:13px;box-shadow:0 3px 10px #193d2612;font-size:16px;color:#275d3d;font-weight:900;margin:10px 0}
+#areaManejoIntegrado .mi-field{border:1px solid #d7e0d8;background:white;border-radius:14px;overflow:hidden;margin-top:12px;box-shadow:0 2px 9px #1b4c2411}
+#areaManejoIntegrado .mi-fieldhead{background:#e4eee6;display:flex;align-items:center;gap:8px;padding:12px;font-size:18px;font-weight:900;color:#1e3f2a}
+#areaManejoIntegrado .mi-fieldhead .mi-name{flex:1;min-width:0;overflow-wrap:anywhere}
+#areaManejoIntegrado .mi-fieldhead .mi-ha{background:#fff;border-radius:20px;padding:5px 10px;color:#2a6640;white-space:nowrap;font-size:15px}
+#areaManejoIntegrado .mi-icon{border:0;background:#eef5ef;color:#23704b;border-radius:9px;padding:7px 10px;font-size:15px;cursor:pointer}
+#areaManejoIntegrado .mi-icon.danger{background:#fceaea;color:#b22b2b}
+#areaManejoIntegrado .mi-card{margin:10px;border:1px solid #dce5de;border-radius:12px;padding:12px;background:#fff}
+#areaManejoIntegrado .mi-cardtop{display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px;margin-bottom:11px}
+#areaManejoIntegrado .mi-date{color:#24673e;white-space:nowrap}
+#areaManejoIntegrado .mi-kind{flex:1}
+#areaManejoIntegrado .mi-products{background:#f3f7f3;border-radius:9px;padding:9px 11px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;font-size:14px}
+#areaManejoIntegrado .mi-products .mi-pname{font-weight:750;overflow-wrap:anywhere}
+#areaManejoIntegrado .mi-products .mi-pdose{color:#21653d;font-weight:800;white-space:nowrap}
+#areaManejoIntegrado .mi-new{display:block;width:calc(100% - 20px);margin:12px 10px;padding:13px;border:2px dashed #629371;background:#f7fbf7;color:#27653e;border-radius:12px;font-size:16px;font-weight:900}
+#areaManejoIntegrado .mi-formpanel{display:none}
+#areaManejoIntegrado .mi-formpanel.on{display:block}
+#areaManejoIntegrado .mi-formpanel .r2{margin-bottom:10px}
+#areaManejoIntegrado .mi-note{font-size:12px;color:#607467;margin:5px 0}
+#areaManejoIntegrado .mi-bottom{display:flex;justify-content:space-between;gap:8px;align-items:center}
+#areaManejoIntegrado .mi-bottom .btn{min-height:40px}
+#areaManejoIntegrado .mi-reportview{display:none;background:white;border:1px solid #d8e2da;border-radius:12px;padding:12px;margin:10px 0}
+#areaManejoIntegrado .mi-reportview.on{display:block}
+#areaManejoIntegrado .mi-reportview h3{color:#245d39}
+@media(max-width:600px){#areaManejoIntegrado .mi-wrap{padding:10px 8px}#areaManejoIntegrado .mi-tools{gap:8px}#areaManejoIntegrado .mi-total{font-size:12px;padding:9px}#areaManejoIntegrado .mi-total strong{font-size:24px}#areaManejoIntegrado .mi-caderno{font-size:12px;padding:9px 4px}#areaManejoIntegrado .mi-panel{padding:11px}#areaManejoIntegrado .mi-fieldhead{font-size:15px;padding:10px 8px}#areaManejoIntegrado .mi-fieldhead .mi-ha{font-size:12px}#areaManejoIntegrado .mi-card{margin:8px;padding:10px}#areaManejoIntegrado .mi-cardtop{font-size:13px}#areaManejoIntegrado .mi-products{font-size:13px}#areaManejoIntegrado .mi-picker select{font-size:14px}}
