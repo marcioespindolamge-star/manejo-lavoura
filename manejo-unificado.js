@@ -23,7 +23,7 @@ function resolverArea(r,areas){
 }
 function areaExibida(r){return esc(r.areaNome||'SEM ÁREA')+' — <b>'+num(r.areaHa).toLocaleString('pt-BR')+' ha</b>'}
 
-const originalStock=stock;
+// Controle de estoque desativado a pedido: o MANEJO não altera o saldo das compras.
 function descontar(id){
  const p=pro(id);if(!p)return 0;
  let total=0;const ids=idsMesmoProduto(id);
@@ -36,11 +36,11 @@ function descontar(id){
  }
  return total;
 }
-stock=function(id){return originalStock(id)-descontar(id)};
+// Nenhuma baixa de estoque é calculada ou aplicada.
 function mostrar(){
  const host=$('areaManejoIntegrado');if(!host)return;
  host.innerHTML='<div class="no-print" style="margin-bottom:10px"><button class="btn" onclick="voltarManejoIntegrado()">← VOLTAR</button></div>'+
- '<h2>MANEJO DAS LAVOURAS</h2><p style="font-size:13px">Registros armazenados no GASTOS. Aplicações novas descontam do estoque; edição e exclusão recalculam o saldo.</p>'+
+ '<h2>MANEJO DAS LAVOURAS</h2><p style="font-size:13px">Registros armazenados no GASTOS. O manejo não desconta produtos nem controla estoque.</p>'+
  '<div class="card" style="padding:12px;margin-bottom:12px"><h3>NOVO MANEJO / EDITAR</h3><form id="miForm"><div class="r2"><div><label>Lavoura</label><select id="miArea" required></select></div><div><label>Data</label><input id="miDia" type="date" required></div></div>'+
  '<div class="r2"><div><label>Tipo de manejo</label><select id="miTipo"><option>Manejo de inverno</option><option>Dessecação</option><option>Plantio</option><option>Adubação</option><option>Capina</option><option>Fungicida</option><option>Herbicida</option><option>Inseticida</option><option>Colheita</option><option>Outro</option></select></div><div><label>Observação</label><input id="miObs"></div></div>'+
  '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
@@ -82,7 +82,7 @@ function listar(){
  target.querySelectorAll('.miDelete').forEach(b=>b.onclick=()=>excluir(b.dataset.id));
 }
 function editar(id){const r=rows().find(x=>x.id===id);if(!r)return;editing=id;$('miArea').value=r.lavouraId;$('miDia').value=r.dia;$('miTipo').value=r.tipo;$('miObs').value=r.observacao||'';$('miProdutos').innerHTML='';(r.produtos||[]).forEach(p=>addProduto(p));if(!r.produtos?.length)addProduto();$('miForm').scrollIntoView({behavior:'smooth'})}
-function excluir(id){if(!confirm('Excluir este manejo? O consumo será retirado do estoque.'))return;db.manejosIntegrados=rows().filter(x=>x.id!==id);save();listar()}
+function excluir(id){if(!confirm('Excluir este manejo?'))return;db.manejosIntegrados=rows().filter(x=>x.id!==id);save();listar()}
 async function importar(e){
  e.preventDefault();if(importBusy)return;
  const status=$('miImportStatus');importBusy=true;status.textContent='Conectando ao banco antigo...';
