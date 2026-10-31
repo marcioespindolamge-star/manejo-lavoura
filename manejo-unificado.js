@@ -119,6 +119,7 @@ const nomesAntigosMI={
  'FUNDO MATO 53':'fundo09','FUNDO VALDOMIRO 9':'fundo10'
 };
 const formatoHaMI=n=>num(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
+const formatoDoseMI=n=>num(n).toLocaleString('pt-BR',{minimumFractionDigits:num(n)>0&&num(n)<1?3:0,maximumFractionDigits:3});
 const dataBRMI=d=>/^\d{4}-\d\d-\d\d$/.test(d||'')?d.slice(8,10)+'/'+d.slice(5,7):esc(d||'');
 function catalogoMI(){
  const base=nomesOriginais.map((x,i)=>({key:chavesOriginais[i],nome:x[0],ha:x[1]}));
