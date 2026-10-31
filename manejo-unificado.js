@@ -160,7 +160,7 @@ mostrar=function(){
  '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
  '<details class="mi-panel" id="miImportBox"><summary style="cursor:pointer;font-weight:800;color:#245d39">IMPORTAR / CONFERIR MANEJOS ANTIGOS</summary><p class="mi-note">Os registros originais não serão apagados. Registros já importados serão reconhecidos pelo ID.</p><form id="miImport"><label>E-mail do MANEJO antigo</label><input id="miEmail" type="email" required autocomplete="username"><label>Senha</label><input id="miSenha" type="password" required autocomplete="current-password"><button class="btn pri" type="submit">CONFERIR REGISTROS</button></form><p id="miImportStatus" role="status"></p></details>'+
  '<div class="mi-bottom"><button class="btn" id="miVoltar">← VOLTAR AO GASTOS</button><span class="mi-note">Sem controle de estoque</span></div></div>';
- $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;listar()};
+ $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;if($('miFormPanel'))$('miFormPanel').classList.remove('on');listar()};
  $('miNovaArea').onclick=()=>editarAreaMI(true);
  $('miCaderno').onclick=()=>window.open('https://marcioespindolamge-star.github.io/quadro-manejo/?abrir=caderno','_blank','noopener');
  $('miRelatorio').onclick=relatorioMI;
@@ -242,5 +242,9 @@ function exportarMI(){
  }
  doc.save('relatorio-manejo.pdf');
 }
-
+// Mostra apenas o cabeçalho do MANEJO enquanto esta aba está aberta.
+const abrirManejoOriginalMI=window.abrirManejoIntegrado;
+window.abrirManejoIntegrado=function(){abrirManejoOriginalMI();const h=document.querySelector('header.topo-gastos');if(h)h.style.display='none'};
+const voltarManejoOriginalMI=window.voltarManejoIntegrado;
+window.voltarManejoIntegrado=function(){voltarManejoOriginalMI();const h=document.querySelector('header.topo-gastos');if(h)h.style.display=''};
 })();
