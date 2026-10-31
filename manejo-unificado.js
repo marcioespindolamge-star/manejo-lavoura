@@ -108,4 +108,138 @@ async function importar(e){
 }
 window.abrirManejoIntegrado=function(){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='produtos'));$('menuPrincipalGastos').style.display='none';$('areaCompras').style.display='none';$('areaManejoIntegrado').style.display='block';mostrar();window.scrollTo(0,0)};
 window.voltarManejoIntegrado=function(){$('areaManejoIntegrado').style.display='none';$('menuPrincipalGastos').style.display='flex';window.scrollTo(0,0)};
+
+/* Quadro visual compacto, inspirado no layout original do MANEJO. */
+let areaSelecionadaMI='',formAbertoMI=false;
+const nomesAntigosMI={
+ 'FRENTE 16':'frente01','FRENTE 29':'frente02','FRENTE 3':'frente03','FRENTE 14':'frente03','FRENTE 9':'frente03',
+ 'FUNDO OVELHA 10':'fundo04','FUNDO OVELHA 8':'fundo04','FUNDO SAIBRO 14':'fundo05',
+ 'FUNDO BERGAMOTEIRA 23':'fundo06','FUNDO TAPERA 25':'fundo07','FUNDO ÁREA NOVA 22':'fundo08',
+ 'FUNDO MATO 53':'fundo09','FUNDO VALDOMIRO 9':'fundo10'
+};
+const formatoHaMI=n=>num(n).toLocaleString('pt-BR',{maximumFractionDigits:2});
+const dataBRMI=d=>/^\d{4}-\d\d-\d\d$/.test(d||'')?d.slice(8,10)+'/'+d.slice(5,7):esc(d||'');
+function catalogoMI(){
+ const base=nomesOriginais.map((x,i)=>({key:chavesOriginais[i],nome:x[0],ha:x[1]}));
+ const catalogo=Array.isArray(db.manejoAreas)?db.manejoAreas:[];
+ for(const a of catalogo){if(!a||!a.key)continue;const i=base.findIndex(b=>b.key===a.key);const novo={key:String(a.key),nome:String(a.nome||''),ha:num(a.ha)};if(i>=0)base[i]=novo;else base.push(novo)}
+ for(const r of rows()){
+  const chave=chaveMI(r);
+  if(base.some(a=>a.key===chave))continue;
+  base.push({key:chave,nome:String(r.areaNome||'ÁREA SEM NOME'),ha:num(r.areaHa)});
+ }
+ return base;
+}
+function chaveMI(r){
+ if(r.areaKey)return String(r.areaKey);
+ const nome=norm(r.areaNome);
+ const original=nomesOriginais.findIndex(a=>norm(a[0])===nome);
+ if(original>=0)return chavesOriginais[original];
+ if(nomesAntigosMI[nome])return nomesAntigosMI[nome];
+ return 'extra-'+nome.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]+/g,'-').toLowerCase();
+}
+function areaMI(){return catalogoMI().find(a=>a.key===areaSelecionadaMI)}
+function atualizarCatalogoMI(){
+ const areas=catalogoMI();
+ if(!areas.some(a=>a.key===areaSelecionadaMI))areaSelecionadaMI=areas[0]?.key||'';
+ const sel=$('miAreaSelect');if(!sel)return;
+ sel.innerHTML=areas.map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
+ sel.value=areaSelecionadaMI;
+ $('miTotal').textContent=formatoHaMI(areas.reduce((v,a)=>v+num(a.ha),0))+' HA';
+}
+mostrar=function(){
+ const host=$('areaManejoIntegrado');if(!host)return;
+ host.innerHTML='<div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
+ '<div class="mi-wrap"><div class="mi-tools"><div class="mi-total">ÁREA TOTAL<strong id="miTotal">—</strong></div><button class="mi-caderno" id="miCaderno">📋 CADERNO DE CAMPO</button></div>'+
+ '<div class="mi-panel"><h3>SELECIONE A LAVOURA</h3><div class="mi-picker"><select id="miAreaSelect" aria-label="Selecione a lavoura"></select><button class="mi-areaadd" id="miNovaArea">+ ÁREA</button></div></div>'+
+ '<button class="mi-report" id="miRelatorio">📄 RELATÓRIO GERAL</button><div class="mi-reportview" id="miReportView"></div>'+
+ '<div id="miLista"></div>'+
+ '<div class="mi-panel mi-formpanel" id="miFormPanel"><h3 id="miFormTitulo">NOVO MANEJO</h3><form id="miForm"><div class="r2"><div><label>Lavoura</label><select id="miArea" required></select></div><div><label>Data</label><input id="miDia" type="date" required></div></div>'+
+ '<div class="r2"><div><label>Tipo de manejo</label><select id="miTipo"><option>Manejo de inverno</option><option>Dessecação</option><option>Plantio</option><option>Adubação</option><option>Capina</option><option>Fungicida</option><option>Herbicida</option><option>Inseticida</option><option>Colheita</option><option>Outro</option></select></div><div><label>Observação</label><input id="miObs"></div></div>'+
+ '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
+ '<details class="mi-panel" id="miImportBox"><summary style="cursor:pointer;font-weight:800;color:#245d39">IMPORTAR / CONFERIR MANEJOS ANTIGOS</summary><p class="mi-note">Os registros originais não serão apagados. Registros já importados serão reconhecidos pelo ID.</p><form id="miImport"><label>E-mail do MANEJO antigo</label><input id="miEmail" type="email" required autocomplete="username"><label>Senha</label><input id="miSenha" type="password" required autocomplete="current-password"><button class="btn pri" type="submit">CONFERIR REGISTROS</button></form><p id="miImportStatus" role="status"></p></details>'+
+ '<div class="mi-bottom"><button class="btn" id="miVoltar">← VOLTAR AO GASTOS</button><span class="mi-note">Sem controle de estoque</span></div></div>';
+ $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;listar()};
+ $('miNovaArea').onclick=()=>editarAreaMI(true);
+ $('miCaderno').onclick=()=>window.open('https://marcioespindolamge-star.github.io/quadro-manejo/?abrir=caderno','_blank','noopener');
+ $('miRelatorio').onclick=relatorioMI;
+ $('miVoltar').onclick=voltarManejoIntegrado;
+ $('miAdd').onclick=()=>addProduto({},true);
+ $('miCancel').onclick=limpar;
+ $('miForm').onsubmit=salvarManejo;
+ $('miImport').onsubmit=importar;
+ $('miDia').value=new Date().toLocaleDateString('en-CA');
+ atualizarCatalogoMI();addProduto();listar();
+};
+function abrirFormularioMI(id){
+ const area=areaMI();if(!area)return;
+ formAbertoMI=true;
+ $('miFormPanel').classList.add('on');
+ $('miFormTitulo').textContent=id?'EDITAR MANEJO':'NOVO MANEJO — '+area.nome;
+ $('miArea').innerHTML=catalogoMI().map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
+ $('miArea').value=areaSelecionadaMI;
+ if(!id){editing=null;$('miForm').reset();$('miArea').value=areaSelecionadaMI;$('miDia').value=new Date().toLocaleDateString('en-CA');$('miProdutos').innerHTML='';addProduto()}
+ $('miFormPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+listar=function(){
+ const target=$('miLista');if(!target)return;
+ atualizarCatalogoMI();
+ const area=areaMI();if(!area){target.textContent='Nenhuma lavoura cadastrada.';return}
+ const rs=rows().filter(r=>chaveMI(r)===area.key).sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
+ target.innerHTML='<section class="mi-field"><div class="mi-fieldhead"><span class="mi-name">'+esc(area.nome)+'</span><button class="mi-icon" id="miEditarArea" title="Editar área">✎</button><span class="mi-ha">'+formatoHaMI(area.ha)+' HA</span></div>'+
+ (rs.length?rs.map(r=>'<article class="mi-card"><div class="mi-cardtop"><span class="mi-date">'+dataBRMI(r.dia)+'</span><span class="mi-kind">'+esc(r.tipo||'Outro')+'</span><button class="mi-icon miEdit" data-id="'+esc(r.id)+'" title="Editar manejo">✎</button><button class="mi-icon danger miDelete" data-id="'+esc(r.id)+'" title="Excluir manejo">×</button></div>'+
+ ((r.produtos||[]).length?'<div class="mi-products">'+r.produtos.map(p=>'<span class="mi-pname">'+esc(p.produto)+'</span><span class="mi-pdose">'+formatoHaMI(p.dose)+' '+esc(p.unidade||'L')+'</span>').join('')+'</div>':'')+
+ (r.observacao?'<p class="mi-note">'+esc(r.observacao)+'</p>':'')+'</article>').join(''):'<p class="mi-note" style="padding:12px">Nenhum manejo registrado nesta lavoura.</p>')+
+ '<button class="mi-new" id="miNovo">+ MANEJO</button></section>';
+ $('miEditarArea').onclick=()=>editarAreaMI(false);
+ $('miNovo').onclick=()=>abrirFormularioMI();
+ target.querySelectorAll('.miEdit').forEach(b=>b.onclick=()=>editar(b.dataset.id));
+ target.querySelectorAll('.miDelete').forEach(b=>b.onclick=()=>excluir(b.dataset.id));
+};
+limpar=function(){editing=null;formAbertoMI=false;const el=$('miFormPanel');if(el)el.classList.remove('on');if($('miForm')){$('miForm').reset();$('miProdutos').innerHTML='';addProduto()}};
+editar=function(id){
+ const r=rows().find(x=>x.id===id);if(!r)return;
+ areaSelecionadaMI=chaveMI(r);abrirFormularioMI(id);editing=id;
+ $('miArea').value=areaSelecionadaMI;$('miDia').value=r.dia;$('miTipo').value=r.tipo;$('miObs').value=r.observacao||'';
+ $('miProdutos').innerHTML='';(r.produtos||[]).forEach(p=>addProduto(p));if(!(r.produtos||[]).length)addProduto();
+};
+salvarManejo=function(e){
+ e.preventDefault();const area=catalogoMI().find(a=>a.key===$('miArea').value);if(!area)return alert('Selecione uma lavoura.');
+ const tipo=$('miTipo').value;
+ const produtos=[...document.querySelectorAll('#miProdutos>.r2')].map(el=>({produto:el.querySelector('.miNome').value.trim(),dose:num(el.querySelector('.miDose').value),unidade:el.querySelector('.miUnidade').value})).filter(p=>p.produto&&p.dose>0);
+ if(!['Plantio','Colheita','Outro'].includes(tipo)&&!produtos.length)return alert('Informe produto e dose.');
+ const anterior=editing?rows().find(r=>r.id===editing):null;
+ const r={...anterior,id:editing||'gastos-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),areaKey:area.key,areaNome:area.nome,areaHa:area.ha,lavouraId:anterior?.lavouraId||'',dia:$('miDia').value,tipo,observacao:$('miObs').value.trim(),produtos};
+ const i=rows().findIndex(x=>x.id===r.id);if(i>=0)db.manejosIntegrados[i]=r;else rows().push(r);
+ areaSelecionadaMI=area.key;save();limpar();listar();
+};
+function editarAreaMI(nova){
+ const a=areaMI();const nome=prompt(nova?'NOME DA NOVA LAVOURA':'NOME DA LAVOURA',nova?'':a?.nome||'');if(nome===null||!nome.trim())return;
+ const h=prompt('ÁREA EM HECTARES',nova?'':String(a?.ha||''));if(h===null)return;
+ const ha=num(h);if(!Number.isFinite(ha)||ha<=0)return alert('Informe hectares válidos.');
+ const lista=catalogoMI();
+ if(nova){const key='nova-'+Date.now().toString(36);lista.push({key,nome:nome.trim().toUpperCase(),ha});areaSelecionadaMI=key}
+ else {const item=lista.find(x=>x.key===areaSelecionadaMI);if(!item)return;item.nome=nome.trim().toUpperCase();item.ha=ha;rows().forEach(r=>{if(chaveMI(r)===item.key){r.areaNome=item.nome;r.areaHa=ha}})}
+ db.manejoAreas=lista;save();atualizarCatalogoMI();listar();
+}
+function relatorioMI(){
+ const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');return}
+ const all=rows().slice().sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
+ box.innerHTML='<h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+all.length+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
+ '<div style="overflow-x:auto"><table><tr><th>DATA</th><th>LAVOURA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr>'+
+ all.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.areaNome)+' — '+formatoHaMI(r.areaHa)+' HA</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoHaMI(p.dose)+' '+p.unidade).join(' / '))+'</td></tr>').join('')+
+ '</table></div><div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button><button class="btn" id="miFecharRel">FECHAR</button></div>';
+ box.classList.add('on');$('miExportar').onclick=exportarMI;$('miFecharRel').onclick=()=>box.classList.remove('on');
+ box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function exportarMI(){
+ if(!window.jspdf?.jsPDF)return alert('Gerador PDF indisponível.');
+ const doc=new window.jspdf.jsPDF();let y=18;doc.setFontSize(15);doc.text('MANEJO DAS LAVOURAS - AGROPECUARIA PAINEIRA',12,y);y+=9;doc.setFontSize(10);
+ for(const r of rows().slice().sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')))){
+  const txt=[dataBRMI(r.dia)+'  '+r.areaNome+'  '+formatoHaMI(r.areaHa)+' HA  - '+r.tipo,...(r.produtos||[]).map(p=>p.produto+': '+formatoHaMI(p.dose)+' '+p.unidade+'/ha')];
+  for(const linha of txt){for(const trecho of doc.splitTextToSize(String(linha),184)){if(y>280){doc.addPage();y=17}doc.text(trecho,12,y);y+=5}}y+=4;
+ }
+ doc.save('relatorio-manejo.pdf');
+}
+
 })();
