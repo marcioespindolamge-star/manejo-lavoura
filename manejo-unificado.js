@@ -216,13 +216,30 @@ salvarManejo=function(e){
  areaSelecionadaMI=area.key;save();limpar();listar();
 };
 function editarAreaMI(nova){
- const a=areaMI();const nome=prompt(nova?'NOME DA NOVA LAVOURA':'NOME DA LAVOURA',nova?'':a?.nome||'');if(nome===null||!nome.trim())return;
- const h=prompt('ÁREA EM HECTARES',nova?'':String(a?.ha||''));if(h===null)return;
- const ha=num(h);if(!Number.isFinite(ha)||ha<=0)return alert('Informe hectares válidos.');
- const lista=catalogoMI();
- if(nova){const key='nova-'+Date.now().toString(36);lista.push({key,nome:nome.trim().toUpperCase(),ha});areaSelecionadaMI=key}
- else {const item=lista.find(x=>x.key===areaSelecionadaMI);if(!item)return;item.nome=nome.trim().toUpperCase();item.ha=ha;rows().forEach(r=>{if(chaveMI(r)===item.key){r.areaNome=item.nome;r.areaHa=ha}})}
- db.manejoAreas=lista;save();atualizarCatalogoMI();listar();
+ const a=areaMI(),antigo=$('miAreaEditor');if(antigo)antigo.remove();
+ const overlay=document.createElement('div');overlay.id='miAreaEditor';
+ overlay.style.cssText='position:fixed;inset:0;background:#0009;z-index:9999;display:flex;align-items:center;justify-content:center;padding:15px';
+ overlay.innerHTML='<form id="miAreaForm" style="background:white;border-radius:14px;padding:20px;width:min(100%,420px);box-shadow:0 10px 35px #0004">'+
+ '<h3 style="color:#245d39;margin:0 0 15px">'+(nova?'NOVA LAVOURA':'EDITAR LAVOURA')+'</h3>'+
+ '<label for="miNomeArea" style="font-weight:800;display:block;margin-bottom:5px">NOME DA LAVOURA</label>'+
+ '<input id="miNomeArea" required style="width:100%;margin-bottom:14px" value="'+esc(nova?'':a?.nome||'')+'">'+
+ '<label for="miHectaresArea" style="font-weight:800;display:block;margin-bottom:5px">ÁREA (HECTARES)</label>'+
+ '<input id="miHectaresArea" required inputmode="decimal" style="width:100%;margin-bottom:18px" value="'+esc(nova?'':String(a?.ha??''))+'">'+
+ '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" id="miCancelarArea">CANCELAR</button><button type="submit" class="btn pri">SALVAR</button></div></form>';
+ document.body.appendChild(overlay);
+ $('miCancelarArea').onclick=()=>overlay.remove();
+ overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove()});
+ $('miAreaForm').onsubmit=e=>{
+  e.preventDefault();
+  const nome=$('miNomeArea').value.trim().toUpperCase(),raw=$('miHectaresArea').value.trim().replace(',','.');
+  const ha=Number(raw);
+  if(!nome||!Number.isFinite(ha)||ha<=0)return alert('Informe o nome e uma área válida em hectares.');
+  const lista=catalogoMI();
+  if(nova){const key='nova-'+Date.now().toString(36);lista.push({key,nome,ha});areaSelecionadaMI=key}
+  else{const item=lista.find(x=>x.key===areaSelecionadaMI);if(!item)return;item.nome=nome;item.ha=ha;rows().forEach(r=>{if(chaveMI(r)===item.key){r.areaNome=nome;r.areaHa=ha}})}
+  db.manejoAreas=lista;save();overlay.remove();atualizarCatalogoMI();listar();
+ };
+ $('miNomeArea').focus();
 }
 function relatorioMI(){
  const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');return}
