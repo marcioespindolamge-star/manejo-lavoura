@@ -1,0 +1,28 @@
+/* Padrão único para as três telas principais: mesma largura e alinhamento. */
+:root{--largura-modulo:820px}
+#produtos:has(#areaCompras[style*="block"]),
+#produtos:has(#areaManejoIntegrado[style*="block"]){max-width:var(--largura-modulo);margin-inline:auto}
+#areaCompras,#areaManejoIntegrado,#acerto,#conferenciaAcerto{
+ width:100%;max-width:var(--largura-modulo);margin-inline:auto;box-sizing:border-box
+}
+#areaCompras>.no-print:first-child,
+#acerto>div:first-child,
+#conferenciaAcerto>div:first-child{margin-bottom:12px!important}
+#areaCompras #resumoGastos{width:100%;margin-inline:auto}
+#areaCompras .gastos-tabs{width:100%;max-width:none;margin-inline:auto}
+#areaCompras #painelCompra{width:100%;max-width:none;margin-inline:auto}
+#areaCompras .gastos-grid>.card{width:100%;max-width:none}
+#areaManejoIntegrado .mi-wrap{width:100%;max-width:none;margin-inline:auto}
+#areaManejoIntegrado .mi-hero{width:100%;border-radius:12px 12px 0 0}
+#areaManejoIntegrado>div:first-child{padding:0 0 12px!important}
+#acerto .acerto-tabs{width:100%;margin-inline:auto}
+#acerto .acerto-card{width:100%;margin-inline:auto}
+@media(max-width:600px){
+ #produtos:has(#areaCompras[style*="block"]),
+ #produtos:has(#areaManejoIntegrado[style*="block"]){width:100%;max-width:100%}
+ #areaCompras,#areaManejoIntegrado,#acerto,#conferenciaAcerto{max-width:100%;padding:0!important}
+ #areaCompras .gastos-grid>.card{max-width:100%!important}
+ #areaCompras #painelCompra{max-width:100%!important}
+ #areaManejoIntegrado .mi-wrap{padding:10px 0}
+ #areaManejoIntegrado .mi-hero{border-radius:12px 12px 0 0}
+}
