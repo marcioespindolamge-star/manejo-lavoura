@@ -151,7 +151,7 @@ function atualizarCatalogoMI(){
 }
 mostrar=function(){
  const host=$('areaManejoIntegrado');if(!host)return;
- host.innerHTML='<div style="padding:10px 12px;background:#f2f6f1"><button class="btn" id="miVoltar">← VOLTAR AO GASTOS</button></div><div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
+ host.innerHTML='<div style="padding:10px 12px;background:#f2f6f1"><button class="btn" id="miVoltar">← VOLTAR</button></div><div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
  '<div class="mi-wrap"><div class="mi-tools"><div class="mi-total">ÁREA TOTAL<strong id="miTotal">—</strong></div><button class="mi-caderno" id="miCaderno">📋 CADERNO DE CAMPO</button></div>'+
  '<div class="mi-panel"><h3>SELECIONE A LAVOURA</h3><div class="mi-picker"><select id="miAreaSelect" aria-label="Selecione a lavoura"></select><button class="mi-areaadd" id="miNovaArea">+ ÁREA</button></div></div>'+
  '<button class="mi-report" id="miRelatorio">📄 RELATÓRIO GERAL</button><div class="mi-reportview" id="miReportView"></div>'+
