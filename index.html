@@ -456,21 +456,19 @@ body:has(#acerto.active) header.topo-gastos{display:none!important}
 #cc_integrado .cc-note{font-size:12px}
 @media(max-width:600px){#cc_integrado .cc-grid{grid-template-columns:1fr}#cc_integrado .cc-head strong{font-size:16px}}
 </style><style>
-/* Caderno de Campo: layout compacto no computador, sem alterar celular. */
+/* Caderno de Campo: mesma largura de 820px do Manejo no computador. */
 @media(min-width:801px){
- #cc_integrado .cc-head{min-height:56px;padding:8px 20px;gap:14px}
- #cc_integrado .cc-head strong{font-size:17px}
- #cc_integrado .cc-head button{padding:7px 11px;font-size:12px}
- #cc_integrado .cc-content{width:calc(100% - 48px);max-width:1180px;padding:12px 0}
+ #cc_integrado .cc-head{width:min(820px,calc(100% - 24px));margin:20px auto 0;min-height:70px;padding:12px 16px;gap:14px;border-radius:12px 12px 0 0}
+ #cc_integrado .cc-head strong{font-size:18px}
+ #cc_integrado .cc-head button{padding:8px 11px;font-size:12px}
+ #cc_integrado .cc-content{width:min(820px,calc(100% - 24px));max-width:820px;margin:0 auto;padding:16px 12px;background:#f2f5f1}
  #cc_integrado .cc-tabs{gap:7px;margin-bottom:9px}
- #cc_integrado .cc-tabs button{padding:7px 12px;font-size:12px}
- #cc_integrado .cc-item{padding:10px 13px;margin:7px 0}
- #cc_integrado .cc-item small{margin:3px 0 5px}
- #cc_integrado .cc-actions{gap:6px;margin-bottom:0}
- #cc_integrado .cc-actions button{padding:6px 10px;font-size:12px}
+ #cc_integrado .cc-tabs button{padding:8px 12px;font-size:12px}
+ #cc_integrado .cc-item{padding:11px 13px;margin:9px 0}
+ #cc_integrado .cc-item small{margin:4px 0 6px}
+ #cc_integrado .cc-actions{gap:7px;margin-bottom:0}
+ #cc_integrado .cc-actions button{padding:7px 11px;font-size:12px}
 }
-/* Migração concluída: ocultar controles de importação sem alterar registros. */
-#miImportBox,#cc_integrado #cc_import,#cc_integrado .cc-note{display:none!important}
 </style><style>
 #areaManutencaoIntegrada{width:100%;max-width:820px;margin-inline:auto;box-sizing:border-box}
 #menuPrincipalGastos{flex-wrap:wrap}
