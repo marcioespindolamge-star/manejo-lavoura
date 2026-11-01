@@ -807,6 +807,18 @@ window.addEventListener('message',function(event){
   if(el){const msg=String(data.message||'').slice(0,250);window.__paineiraStatusManutencao=msg||'Conectando';if(window.__paineiraAtualizaStatus)window.__paineiraAtualizaStatus();el.textContent='';el.style.display='none';}
  }
 });
+/* Pré-carrega a aplicação de manutenção após a tela principal ficar pronta.
+   Mantém o iframe e o Firebase originais; não cria conexões duplicadas. */
+function prepararManutencaoIntegrada(){
+ const frame=document.getElementById('manutencaoIntegradaFrame');
+ if(frame&&!frame.getAttribute('src')){
+  frame.setAttribute('loading','eager');
+  frame.src='https://marcioespindolamge-star.github.io/controle-manutencao/?integrado=1&v=20261101-24';
+ }
+}
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',()=>setTimeout(prepararManutencaoIntegrada,1200),{once:true});
+}else setTimeout(prepararManutencaoIntegrada,1200);
 function abrirManutencaoIntegrada(){
  document.body.classList.add('modulo-manutencao-aberto');
  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='produtos'));
@@ -815,7 +827,7 @@ function abrirManutencaoIntegrada(){
  document.getElementById('areaManejoIntegrado').style.display='none';
  const panel=document.getElementById('areaManutencaoIntegrada');panel.style.display='block';
  const frame=document.getElementById('manutencaoIntegradaFrame');
- if(!frame.getAttribute('src'))frame.src='https://marcioespindolamge-star.github.io/controle-manutencao/?integrado=1&v=20261101-16';
+ prepararManutencaoIntegrada();
  window.scrollTo(0,0);
 }
 function voltarManutencaoIntegrada(){
