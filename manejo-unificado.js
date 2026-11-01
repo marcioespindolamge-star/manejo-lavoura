@@ -152,9 +152,9 @@ function atualizarCatalogoMI(){
 mostrar=function(){
  const host=$('areaManejoIntegrado');if(!host)return;
  host.innerHTML='<div style="padding:10px 12px;background:#f2f6f1"><button class="btn" id="miVoltar">← VOLTAR</button></div><div class="mi-hero"><img class="mi-logo" src="https://marcioespindolamge-star.github.io/quadro-manejo/LogoTrator.png" alt="Manejo"><h2>MANEJO DAS LAVOURAS</h2><p>AGROPECUÁRIA PAINEIRA</p></div>'+
- '<div class="mi-wrap"><div class="mi-tools"><div class="mi-total">ÁREA TOTAL<strong id="miTotal">—</strong></div><button class="mi-caderno" id="miCaderno">📋 CADERNO DE CAMPO</button></div>'+
+ '<div class="mi-wrap"><div class="mi-tools"><div class="mi-total">ÁREA TOTAL<strong id="miTotal">—</strong></div><div class="mi-toolbuttons"><button class="mi-caderno" id="miCaderno">📋 CADERNO DE CAMPO</button><button class="mi-report" id="miRelatorio">📄 RELATÓRIO GERAL</button></div></div>'+
  '<div class="mi-panel"><h3>SELECIONE A LAVOURA</h3><div class="mi-picker"><select id="miAreaSelect" aria-label="Selecione a lavoura"></select><button class="mi-areaadd" id="miNovaArea">+ ÁREA</button></div></div>'+
- '<button class="mi-report" id="miRelatorio">📄 RELATÓRIO GERAL</button><div class="mi-reportview" id="miReportView"></div>'+
+ '<div class="mi-reportview" id="miReportView"></div>'+
  '<div id="miLista"></div>'+
  '<div class="mi-panel mi-formpanel" id="miFormPanel"><h3 id="miFormTitulo">NOVO MANEJO</h3><form id="miForm"><div class="r2"><div><label>Lavoura</label><select id="miArea" required></select></div><div><label>Data</label><input id="miDia" type="date" required></div></div>'+
  '<div class="r2"><div><label>Tipo de manejo</label><select id="miTipo"><option>Manejo de inverno</option><option>Dessecação</option><option>Plantio</option><option>Adubação</option><option>Capina</option><option>Fungicida</option><option>Herbicida</option><option>Inseticida</option><option>Colheita</option><option>Outro</option></select></div><div><label>Observação</label><input id="miObs"></div></div>'+
