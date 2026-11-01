@@ -242,23 +242,45 @@ function editarAreaMI(nova){
  };
  $('miNomeArea').focus();
 }
+function gruposRelatorioMI(){
+ const grupos=new Map();
+ for(const area of catalogoMI())grupos.set(area.key,{nome:area.nome,ha:area.ha,registros:[]});
+ for(const r of rows()){
+  const chave=chaveMI(r);
+  if(!grupos.has(chave))grupos.set(chave,{nome:r.areaNome||'SEM ÁREA',ha:r.areaHa||0,registros:[]});
+  grupos.get(chave).registros.push(r);
+ }
+ return [...grupos.values()].filter(g=>g.registros.length).map(g=>({
+  ...g,registros:g.registros.sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')))
+ }));
+}
 function relatorioMI(){
  const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');return}
- const all=rows().slice().sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
- box.innerHTML='<h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+all.length+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
- '<div style="overflow-x:auto"><table><tr><th>DATA</th><th>LAVOURA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr>'+
- all.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.areaNome)+' — '+formatoHaMI(r.areaHa)+' HA</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoHaMI(p.dose)+' '+p.unidade).join(' / '))+'</td></tr>').join('')+
- '</table></div><div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button><button class="btn" id="miFecharRel">FECHAR</button></div>';
+ const grupos=gruposRelatorioMI(),quantidade=grupos.reduce((n,g)=>n+g.registros.length,0);
+ box.innerHTML='<h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+quantidade+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
+ (grupos.length?grupos.map(g=>'<section class="mi-report-area"><h4>'+esc(g.nome)+' — '+formatoHaMI(g.ha)+' HA <small>('+g.registros.length+' manejos)</small></h4>'+
+ '<div style="overflow-x:auto"><table><thead><tr><th>DATA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr></thead><tbody>'+
+ g.registros.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoDoseMI(p.dose)+' '+p.unidade+'/ha').join(' / ')||r.observacao||'—')+'</td></tr>').join('')+
+ '</tbody></table></div></section>').join(''):'<p>Nenhum manejo cadastrado.</p>')+
+ '<div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button><button class="btn" id="miFecharRel">FECHAR</button></div>';
  box.classList.add('on');document.body.classList.add('mi-relatorio-aberto');box.scrollTop=0;$('miExportar').onclick=exportarMI;$('miFecharRel').onclick=()=>{box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');};
 }
 function exportarMI(){
  if(!window.jspdf?.jsPDF)return alert('Gerador PDF indisponível.');
- const doc=new window.jspdf.jsPDF();let y=18;doc.setFontSize(15);doc.text('MANEJO DAS LAVOURAS - AGROPECUARIA PAINEIRA',12,y);y+=9;doc.setFontSize(10);
- for(const r of rows().slice().sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')))){
-  const txt=[dataBRMI(r.dia)+'  '+r.areaNome+'  '+formatoHaMI(r.areaHa)+' HA  - '+r.tipo,...(r.produtos||[]).map(p=>p.produto+': '+formatoHaMI(p.dose)+' '+p.unidade+'/ha')];
-  for(const linha of txt){for(const trecho of doc.splitTextToSize(String(linha),184)){if(y>280){doc.addPage();y=17}doc.text(trecho,12,y);y+=5}}y+=4;
+ const doc=new window.jspdf.jsPDF();let y=18;doc.setFontSize(15);doc.text('MANEJO DAS LAVOURAS - AGROPECUARIA PAINEIRA',12,y);y+=12;doc.setFontSize(10);
+ const linhaPDF=(linha)=>{for(const trecho of doc.splitTextToSize(String(linha),184)){if(y>280){doc.addPage();y=17}doc.text(trecho,12,y);y+=5}};
+ for(const g of gruposRelatorioMI()){
+  if(y>258){doc.addPage();y=17}
+  doc.setFont('helvetica','bold');linhaPDF(g.nome+' - '+formatoHaMI(g.ha)+' HA ('+g.registros.length+' manejos)');doc.setFont('helvetica','normal');y+=2;
+  for(const r of g.registros){
+   linhaPDF(dataBRMI(r.dia)+'  '+r.tipo);
+   for(const p of r.produtos||[])linhaPDF('   '+p.produto+': '+formatoDoseMI(p.dose)+' '+p.unidade+'/ha');
+   if(!(r.produtos||[]).length&&r.observacao)linhaPDF('   '+r.observacao);
+   y+=3;
+  }
+  y+=5;
  }
- doc.save('relatorio-manejo.pdf');
+ doc.save('relatorio-manejo-por-areas.pdf');
 }
 // Mostra apenas o cabeçalho do MANEJO enquanto esta aba está aberta.
 const abrirManejoOriginalMI=window.abrirManejoIntegrado;
