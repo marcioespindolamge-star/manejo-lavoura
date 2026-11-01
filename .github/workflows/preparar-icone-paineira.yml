@@ -2,7 +2,7 @@ name: Preparar icone do atalho iPhone
 on:
   push:
     paths:
-      - .github/workflows/preparar-icone-paineira.yml
+      - index.html
 permissions:
   contents: write
 jobs:
