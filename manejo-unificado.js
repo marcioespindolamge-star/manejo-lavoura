@@ -163,7 +163,7 @@ mostrar=function(){
  '</div>';
  $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;if($('miFormPanel'))$('miFormPanel').classList.remove('on');listar()};
  $('miNovaArea').onclick=()=>editarAreaMI(true);
- $('miCaderno').onclick=()=>{let panel=document.getElementById('miCadernoIntegrado');if(!panel){panel=document.createElement('div');panel.id='miCadernoIntegrado';panel.style.cssText='position:fixed;inset:0;z-index:10000;background:#f2f5f1;display:flex;flex-direction:column';panel.innerHTML='<div style="display:flex;align-items:center;gap:12px;background:#245c36;color:white;padding:10px 14px"><button type="button" id="miFecharCaderno" style="background:white;color:#245c36;border:0;border-radius:7px;padding:9px 12px;font-weight:800">← VOLTAR</button><strong>CADERNO DE CAMPO</strong></div><iframe title="Caderno de Campo" src="https://marcioespindolamge-star.github.io/quadro-manejo/?abrir=caderno" style="flex:1;width:100%;border:0;background:white" loading="eager"></iframe>';document.body.appendChild(panel);panel.querySelector('#miFecharCaderno').onclick=()=>{panel.remove();};}else panel.style.display='flex';};
+ $('miCaderno').onclick=()=>window.abrirCadernoIntegrado();
  $('miRelatorio').onclick=relatorioMI;
  $('miVoltar').onclick=voltarManejoIntegrado;
  $('miVoltar').classList.add('mi-voltar');host.querySelector('.mi-hero').prepend($('miVoltar'));
