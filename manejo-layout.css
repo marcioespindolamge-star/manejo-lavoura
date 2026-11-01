@@ -52,3 +52,10 @@ body.mi-relatorio-aberto{overflow:hidden!important}
 #areaManejoIntegrado .mi-report-area table{width:100%;border-collapse:collapse;min-width:490px;font-size:12px}
 #areaManejoIntegrado .mi-report-area th,#areaManejoIntegrado .mi-report-area td{border:1px solid #dce4df;padding:9px;text-align:left;vertical-align:top}
 #areaManejoIntegrado .mi-report-area th{background:#f2f6f2}
+
+/* Ações compactas lado a lado no topo do Manejo. */
+#areaManejoIntegrado .mi-tools{grid-template-columns:minmax(110px,0.75fr) minmax(0,2fr)}
+#areaManejoIntegrado .mi-toolbuttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:0}
+#areaManejoIntegrado .mi-toolbuttons .mi-caderno,#areaManejoIntegrado .mi-toolbuttons .mi-report{width:100%;min-width:0;min-height:42px;margin:0;padding:8px 5px;font-size:12px;line-height:1.2;border-radius:9px;box-shadow:none}
+#areaManejoIntegrado .mi-toolbuttons .mi-report{background:#fff;border:1px solid #cdded2;color:#275d3d}
+@media(max-width:600px){#areaManejoIntegrado .mi-tools{grid-template-columns:minmax(95px,0.72fr) minmax(0,2fr);gap:7px}#areaManejoIntegrado .mi-toolbuttons{gap:5px}#areaManejoIntegrado .mi-toolbuttons .mi-caderno,#areaManejoIntegrado .mi-toolbuttons .mi-report{font-size:10px;padding:7px 3px;min-height:43px}}
