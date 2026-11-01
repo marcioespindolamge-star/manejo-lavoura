@@ -45,3 +45,10 @@ body.mi-relatorio-aberto{overflow:hidden!important}
 #areaManejoIntegrado .mi-reportview.on>h3,#areaManejoIntegrado .mi-reportview.on>.mi-note,#areaManejoIntegrado .mi-reportview.on>.actions{max-width:900px;margin-left:auto;margin-right:auto}
 #areaManejoIntegrado .mi-reportview.on>div:has(>table){max-width:900px;margin-left:auto;margin-right:auto;background:#fff;border-radius:10px}
 #areaManejoIntegrado .mi-reportview.on table{min-width:680px}
+
+#areaManejoIntegrado .mi-report-area{max-width:900px;margin:18px auto 24px;background:#fff;border:1px solid #d9e3dc;border-radius:10px;overflow:hidden}
+#areaManejoIntegrado .mi-report-area h4{margin:0;padding:12px;background:#e4eee6;color:#245d39;font-size:15px}
+#areaManejoIntegrado .mi-report-area h4 small{font-size:12px;font-weight:500}
+#areaManejoIntegrado .mi-report-area table{width:100%;border-collapse:collapse;min-width:490px;font-size:12px}
+#areaManejoIntegrado .mi-report-area th,#areaManejoIntegrado .mi-report-area td{border:1px solid #dce4df;padding:9px;text-align:left;vertical-align:top}
+#areaManejoIntegrado .mi-report-area th{background:#f2f6f2}
