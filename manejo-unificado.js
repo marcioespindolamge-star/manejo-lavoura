@@ -243,14 +243,13 @@ function editarAreaMI(nova){
  $('miNomeArea').focus();
 }
 function relatorioMI(){
- const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');return}
+ const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');return}
  const all=rows().slice().sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
  box.innerHTML='<h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+all.length+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
  '<div style="overflow-x:auto"><table><tr><th>DATA</th><th>LAVOURA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr>'+
  all.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.areaNome)+' — '+formatoHaMI(r.areaHa)+' HA</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoHaMI(p.dose)+' '+p.unidade).join(' / '))+'</td></tr>').join('')+
  '</table></div><div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button><button class="btn" id="miFecharRel">FECHAR</button></div>';
- box.classList.add('on');$('miExportar').onclick=exportarMI;$('miFecharRel').onclick=()=>box.classList.remove('on');
- box.scrollIntoView({behavior:'smooth',block:'start'});
+ box.classList.add('on');document.body.classList.add('mi-relatorio-aberto');box.scrollTop=0;$('miExportar').onclick=exportarMI;$('miFecharRel').onclick=()=>{box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');};
 }
 function exportarMI(){
  if(!window.jspdf?.jsPDF)return alert('Gerador PDF indisponível.');
