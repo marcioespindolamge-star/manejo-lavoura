@@ -143,9 +143,9 @@ function chaveMI(r){
 function areaMI(){return catalogoMI().find(a=>a.key===areaSelecionadaMI)}
 function atualizarCatalogoMI(){
  const areas=catalogoMI();
- if(!areas.some(a=>a.key===areaSelecionadaMI))areaSelecionadaMI=areas[0]?.key||'';
+ if(areaSelecionadaMI&&!areas.some(a=>a.key===areaSelecionadaMI))areaSelecionadaMI='';
  const sel=$('miAreaSelect');if(!sel)return;
- sel.innerHTML=areas.map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
+ sel.innerHTML='<option value="">SELECIONE UMA LAVOURA</option>'+areas.map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
  sel.value=areaSelecionadaMI;
  $('miTotal').textContent=formatoHaMI(areas.reduce((v,a)=>v+num(a.ha),0))+' HA';
 }
@@ -187,7 +187,7 @@ function abrirFormularioMI(id){
 listar=function(){
  const target=$('miLista');if(!target)return;
  atualizarCatalogoMI();
- const area=areaMI();if(!area){target.textContent='Nenhuma lavoura cadastrada.';return}
+ const area=areaMI();if(!area){target.innerHTML='<div class="mi-panel" style="text-align:center;color:#55705d;padding:18px">Selecione uma lavoura acima para visualizar seus manejos.</div>';return}
  const rs=rows().filter(r=>chaveMI(r)===area.key).sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
  target.innerHTML='<section class="mi-field"><div class="mi-fieldhead"><span class="mi-name">'+esc(area.nome)+'</span><button class="mi-icon" id="miEditarArea" title="Editar área">✎</button><span class="mi-ha">'+formatoHaMI(area.ha)+' HA</span></div>'+
  (rs.length?rs.map(r=>'<article class="mi-card"><div class="mi-cardtop"><span class="mi-date">'+dataBRMI(r.dia)+'</span><span class="mi-kind">'+esc(r.tipo||'Outro')+'</span><button class="mi-icon miEdit" data-id="'+esc(r.id)+'" title="Editar manejo">✎</button><button class="mi-icon danger miDelete" data-id="'+esc(r.id)+'" title="Excluir manejo">×</button></div>'+
