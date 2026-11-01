@@ -257,13 +257,13 @@ function gruposRelatorioMI(){
 function relatorioMI(){
  const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');return}
  const grupos=gruposRelatorioMI(),quantidade=grupos.reduce((n,g)=>n+g.registros.length,0);
- box.innerHTML='<h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+quantidade+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
+ box.innerHTML='<div class="mi-report-top"><button type="button" class="btn" id="miVoltarRel">← VOLTAR</button></div><h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+quantidade+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
  (grupos.length?grupos.map(g=>'<section class="mi-report-area"><h4>'+esc(g.nome)+' — '+formatoHaMI(g.ha)+' HA <small>('+g.registros.length+' manejos)</small></h4>'+
  '<div style="overflow-x:auto"><table><thead><tr><th>DATA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr></thead><tbody>'+
  g.registros.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoDoseMI(p.dose)+' '+p.unidade+'/ha').join(' / ')||r.observacao||'—')+'</td></tr>').join('')+
  '</tbody></table></div></section>').join(''):'<p>Nenhum manejo cadastrado.</p>')+
- '<div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button><button class="btn" id="miFecharRel">FECHAR</button></div>';
- box.classList.add('on');document.body.classList.add('mi-relatorio-aberto');box.scrollTop=0;$('miExportar').onclick=exportarMI;$('miFecharRel').onclick=()=>{box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');};
+ '<div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button></div>';
+ box.classList.add('on');document.body.classList.add('mi-relatorio-aberto');box.scrollTop=0;$('miExportar').onclick=exportarMI;$('miVoltarRel').onclick=()=>{box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');};
 }
 function exportarMI(){
  if(!window.jspdf?.jsPDF)return alert('Gerador PDF indisponível.');
