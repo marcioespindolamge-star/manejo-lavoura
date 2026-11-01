@@ -6,5 +6,13 @@
   "background_color": "#ffffff",
   "theme_color": "#174d2c",
   "scope": "./",
-  "id": "./"
+  "id": "./",
+  "icons": [
+    {
+      "src": "./logo-paineira-novo.png?v=20261101-30",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
