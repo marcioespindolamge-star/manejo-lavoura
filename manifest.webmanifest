@@ -1,15 +1,17 @@
 {
-  "name": "Gastos da Lavoura",
-  "short_name": "Gastos Lavoura",
+  "name": "CONTROLE GERAL - AGROPECUÁRIA PAINEIRA",
+  "short_name": "CONTROLE GERAL",
   "start_url": "./",
-  "display": "browser",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#174d2c",
   "icons": [
     {
-      "src": "gastos-icon.png?v=20260925-1",
-      "sizes": "96x96",
-      "type": "image/png"
+      "src": "logo-paineira-novo.png?v=20261101-27",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "scope": "./"
 }
