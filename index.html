@@ -804,7 +804,7 @@ window.addEventListener('message',function(event){
   frame.style.height=Math.max(480,Math.min(30000,Math.ceil(data.height)+16))+'px';
  }else if(data.type==='sync'){
   const el=document.getElementById('statusManutencaoIntegrada');
-  if(el){const msg=String(data.message||'').slice(0,250);window.__paineiraStatusManutencao=msg||'Conectando';if(window.__paineiraAtualizaStatus)window.__paineiraAtualizaStatus();el.textContent='';el.style.display='none';}
+  if(el){const msg=String(data.message||'').slice(0,500);window.__paineiraStatusManutencao=msg||'Conectando';if(window.__paineiraAtualizaStatus)window.__paineiraAtualizaStatus();const erro=/permission-denied|não autorizado|não foi possível|erro|falha|bloquead/i.test(msg);el.textContent=erro?'MANUTENÇÃO: '+msg:'';el.style.display=erro?'block':'none';el.style.padding=erro?'12px':'';el.style.margin=erro?'12px 0':'';el.style.border=erro?'1px solid #d44':'';el.style.borderRadius=erro?'8px':'';el.style.background=erro?'#fff1f0':'';el.style.color=erro?'#8d211c':'';}
  }
 });
 /* Pré-carrega a aplicação de manutenção após a tela principal ficar pronta.
