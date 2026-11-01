@@ -1,17 +1,10 @@
 {
   "name": "CONTROLE GERAL - AGROPECUÁRIA PAINEIRA",
   "short_name": "CONTROLE GERAL",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#174d2c",
-  "icons": [
-    {
-      "src": "logo-paineira-novo.png?v=20261101-27",
-      "sizes": "any",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "scope": "./"
+  "scope": "./",
+  "id": "./"
 }
