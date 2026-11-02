@@ -51,7 +51,7 @@ function mostrar(){
  $('miAdd').onclick=()=>addProduto();
  $('miCancel').onclick=limpar;
  $('miForm').onsubmit=salvarManejo;
- $('miImport').onsubmit=importar;
+ if($('miImport'))$('miImport').onsubmit=importar;
  addProduto();listar();
 }
 function addProduto(p={},foco=false){
@@ -159,7 +159,6 @@ mostrar=function(){
  '<div class="mi-panel mi-formpanel" id="miFormPanel"><h3 id="miFormTitulo">NOVO MANEJO</h3><form id="miForm"><div class="r2"><div><label>Lavoura</label><select id="miArea" required></select></div><div><label>Data</label><input id="miDia" type="date" required></div></div>'+
  '<div class="r2"><div><label>Tipo de manejo</label><select id="miTipo"><option>Manejo de inverno</option><option>Dessecação</option><option>Plantio</option><option>Adubação</option><option>Capina</option><option>Fungicida</option><option>Herbicida</option><option>Inseticida</option><option>Colheita</option><option>Outro</option></select></div><div><label>Observação</label><input id="miObs"></div></div>'+
  '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
- '<details class="mi-panel" id="miImportBox"><summary style="cursor:pointer;font-weight:800;color:#245d39">IMPORTAR / CONFERIR MANEJOS ANTIGOS</summary><p class="mi-note">Os registros originais não serão apagados. Registros já importados serão reconhecidos pelo ID.</p><form id="miImport"><label>E-mail do MANEJO antigo</label><input id="miEmail" type="email" required autocomplete="username"><label>Senha</label><input id="miSenha" type="password" required autocomplete="current-password"><button class="btn pri" type="submit">CONFERIR REGISTROS</button></form><p id="miImportStatus" role="status"></p></details>'+
  '</div>';
  $('miAreaSelect').onchange=e=>{areaSelecionadaMI=e.target.value;formAbertoMI=false;if($('miFormPanel'))$('miFormPanel').classList.remove('on');listar()};
  $('miNovaArea').onclick=()=>editarAreaMI(true);
@@ -170,7 +169,7 @@ mostrar=function(){
  $('miAdd').onclick=()=>addProduto({},true);
  $('miCancel').onclick=limpar;
  $('miForm').onsubmit=salvarManejo;
- $('miImport').onsubmit=importar;
+ if($('miImport'))$('miImport').onsubmit=importar;
  $('miDia').value=new Date().toLocaleDateString('en-CA');
  atualizarCatalogoMI();addProduto();listar();
 };
