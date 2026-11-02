@@ -2,6 +2,8 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const caixaAlta=v=>String(v??'').toLocaleUpperCase('pt-BR');
+const unidade=v=>String(v||'L').toUpperCase()==='KG'?'KG':'L';
 const norm=v=>String(v||'').trim().toUpperCase().replace(/\s+/g,' ');
 const num=v=>{const m=String(v??'0').replace(',','.').match(/-?[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):0};
 const rows=()=>Array.isArray(db.manejosIntegrados)?db.manejosIntegrados:(db.manejosIntegrados=[]);
@@ -46,7 +48,7 @@ function mostrar(){
  '<div id="miProdutos"></div><div class="actions"><button type="button" class="btn" id="miAdd">+ PRODUTO</button><button class="btn pri" type="submit">SALVAR MANEJO</button><button type="button" class="btn" id="miCancel">CANCELAR</button></div></form></div>'+
  '<div class="card" style="padding:12px;margin-bottom:12px"><h3>REGISTROS</h3><div id="miLista"></div></div>'+
  '<details class="card" style="padding:12px"><summary style="cursor:pointer;font-weight:bold">IMPORTAR MANEJOS ANTIGOS (UMA VEZ)</summary><p style="font-size:13px">Para preservar o histórico do Firebase antigo, informe o acesso do MANEJO uma única vez. Os documentos serão copiados pelo ID original. Nenhum registro antigo será apagado.</p><form id="miImport"><label>E-mail do MANEJO</label><input id="miEmail" type="email" required autocomplete="username"><label>Senha do MANEJO</label><input id="miSenha" type="password" required autocomplete="current-password"><button class="btn pri" type="submit">IMPORTAR REGISTROS</button></form><p id="miImportStatus" role="status"></p></details>';
- $('miArea').innerHTML=db.lavouras.map(l=>'<option value="'+esc(l.id)+'">'+esc(l.nome)+' — '+num(l.area)+' ha</option>').join('');
+ $('miArea').innerHTML=db.lavouras.map(l=>'<option value="'+esc(l.id)+'">'+esc(caixaAlta(l.nome))+' — '+num(l.area)+' ha</option>').join('');
  $('miDia').value=new Date().toISOString().slice(0,10);
  $('miAdd').onclick=()=>addProduto();
  $('miCancel').onclick=limpar;
@@ -60,7 +62,7 @@ function addProduto(p={},foco=false){
  $('miProdutos').appendChild(el);el.querySelector('.miUnidade').value=p.unidade||'L';
  el.querySelector('.miRem').onclick=()=>el.remove();
  let datalist=$('miSugestoes');if(!datalist){datalist=document.createElement('datalist');datalist.id='miSugestoes';$('miProdutos').appendChild(datalist)}
- datalist.innerHTML=produtosUnicos().map(x=>'<option value="'+esc(x.nome)+'"></option>').join('');
+ datalist.innerHTML=produtosUnicos().map(x=>'<option value="'+esc(caixaAlta(x.nome))+'"></option>').join('');
  if(foco)el.querySelector('.miNome').focus();
 }
 function limpar(){editing=null;$('miForm').reset();$('miProdutos').innerHTML='';addProduto()}
@@ -77,7 +79,7 @@ function lavById(id){return db.lavouras.find(l=>String(l.id)===String(id))}
 function listar(){
  const target=$('miLista');if(!target)return;
  const arr=[...rows()].sort((a,b)=>String(b.dia||'').localeCompare(String(a.dia||'')));
- target.innerHTML=arr.length?'<div style="overflow-x:auto"><table><tr><th>Data</th><th>Área</th><th>Manejo / Produtos</th><th>Ações</th></tr>'+arr.map(r=>'<tr><td>'+esc(r.dia)+'</td><td>'+esc(r.areaNome)+'</td><td><b>'+esc(r.tipo)+'</b><div>'+esc((r.produtos||[]).map(p=>p.produto+' '+p.dose+' '+p.unidade+'/ha').join(' • '))+'</div></td><td><button class="btn miEdit" data-id="'+esc(r.id)+'">EDITAR</button> <button class="btn danger miDelete" data-id="'+esc(r.id)+'">EXCLUIR</button></td></tr>').join('')+'</table></div>':'Nenhum manejo registrado neste banco.';
+ target.innerHTML=arr.length?'<div style="overflow-x:auto"><table><tr><th>Data</th><th>Área</th><th>Manejo / Produtos</th><th>Ações</th></tr>'+arr.map(r=>'<tr><td>'+esc(r.dia)+'</td><td>'+esc(caixaAlta(r.areaNome))+'</td><td><b>'+esc(caixaAlta(r.tipo))+'</b><div>'+esc((r.produtos||[]).map(p=>p.produto+' '+p.dose+' '+p.unidade+'/ha').join(' • '))+'</div></td><td><button class="btn miEdit" data-id="'+esc(r.id)+'">EDITAR</button> <button class="btn danger miDelete" data-id="'+esc(r.id)+'">EXCLUIR</button></td></tr>').join('')+'</table></div>':'Nenhum manejo registrado neste banco.';
  target.querySelectorAll('.miEdit').forEach(b=>b.onclick=()=>editar(b.dataset.id));
  target.querySelectorAll('.miDelete').forEach(b=>b.onclick=()=>excluir(b.dataset.id));
 }
@@ -145,9 +147,9 @@ function atualizarCatalogoMI(){
  const areas=catalogoMI();
  if(areaSelecionadaMI&&!areas.some(a=>a.key===areaSelecionadaMI))areaSelecionadaMI='';
  const sel=$('miAreaSelect');if(!sel)return;
- sel.innerHTML='<option value="">SELECIONE UMA LAVOURA</option>'+areas.map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
+ sel.innerHTML='<option value="">SELECIONE UMA LAVOURA</option>'+areas.map(a=>'<option value="'+esc(a.key)+'">'+esc(caixaAlta(a.nome))+' — '+formatoHaMI(a.ha)+' ha</option>').join('');
  sel.value=areaSelecionadaMI;
- $('miTotal').textContent=formatoHaMI(areas.reduce((v,a)=>v+num(a.ha),0))+' HA';
+ $('miTotal').textContent=formatoHaMI(areas.reduce((v,a)=>v+num(a.ha),0))+' ha';
 }
 mostrar=function(){
  const host=$('areaManejoIntegrado');if(!host)return;
@@ -178,7 +180,7 @@ function abrirFormularioMI(id){
  formAbertoMI=true;
  $('miFormPanel').classList.add('on');
  $('miFormTitulo').textContent=id?'EDITAR MANEJO':'NOVO MANEJO — '+area.nome;
- $('miArea').innerHTML=catalogoMI().map(a=>'<option value="'+esc(a.key)+'">'+esc(a.nome)+' — '+formatoHaMI(a.ha)+' HA</option>').join('');
+ $('miArea').innerHTML=catalogoMI().map(a=>'<option value="'+esc(a.key)+'">'+esc(caixaAlta(a.nome))+' — '+formatoHaMI(a.ha)+' ha</option>').join('');
  $('miArea').value=areaSelecionadaMI;
  if(!id){editing=null;$('miForm').reset();$('miArea').value=areaSelecionadaMI;$('miDia').value=new Date().toLocaleDateString('en-CA');$('miProdutos').innerHTML='';addProduto()}
  $('miFormPanel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -188,10 +190,10 @@ listar=function(){
  atualizarCatalogoMI();
  const area=areaMI();if(!area){target.innerHTML='<div class="mi-panel" style="text-align:center;color:#55705d;padding:18px">Selecione uma lavoura acima para visualizar seus manejos.</div>';return}
  const rs=rows().filter(r=>chaveMI(r)===area.key).sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
- target.innerHTML='<section class="mi-field"><div class="mi-fieldhead"><span class="mi-name">'+esc(area.nome)+'</span><button class="mi-icon" id="miEditarArea" title="Editar área">✎</button><span class="mi-ha">'+formatoHaMI(area.ha)+' HA</span></div>'+
- (rs.length?rs.map(r=>'<article class="mi-card"><div class="mi-cardtop"><span class="mi-date">'+dataBRMI(r.dia)+'</span><span class="mi-kind">'+esc(r.tipo||'Outro')+'</span><button class="mi-icon miEdit" data-id="'+esc(r.id)+'" title="Editar manejo">✎</button><button class="mi-icon danger miDelete" data-id="'+esc(r.id)+'" title="Excluir manejo">×</button></div>'+
- ((r.produtos||[]).length?'<div class="mi-products">'+r.produtos.map(p=>'<span class="mi-pname">'+esc(p.produto)+'</span><span class="mi-pdose">'+formatoHaMI(p.dose)+' '+esc(p.unidade||'L')+'</span>').join('')+'</div>':'')+
- (r.observacao?'<p class="mi-note">'+esc(r.observacao)+'</p>':'')+'</article>').join(''):'<p class="mi-note" style="padding:12px">Nenhum manejo registrado nesta lavoura.</p>')+
+ target.innerHTML='<section class="mi-field"><div class="mi-fieldhead"><span class="mi-name">'+esc(caixaAlta(area.nome))+'</span><button class="mi-icon" id="miEditarArea" title="Editar área">✎</button><span class="mi-ha">'+formatoHaMI(area.ha)+' ha</span></div>'+
+ (rs.length?rs.map(r=>'<article class="mi-card"><div class="mi-cardtop"><span class="mi-date">'+dataBRMI(r.dia)+'</span><span class="mi-kind">'+esc(caixaAlta(r.tipo||'Outro'))+'</span><button class="mi-icon miEdit" data-id="'+esc(r.id)+'" title="Editar manejo">✎</button><button class="mi-icon danger miDelete" data-id="'+esc(r.id)+'" title="Excluir manejo">×</button></div>'+
+ ((r.produtos||[]).length?'<div class="mi-products">'+r.produtos.map(p=>'<span class="mi-pname">'+esc(caixaAlta(p.produto))+'</span><span class="mi-pdose">'+formatoHaMI(p.dose)+' '+esc(unidade(p.unidade))+'</span>').join('')+'</div>':'')+
+ (r.observacao?'<p class="mi-note">'+esc(caixaAlta(r.observacao))+'</p>':'')+'</article>').join(''):'<p class="mi-note" style="padding:12px">Nenhum manejo registrado nesta lavoura.</p>')+
  '<button class="mi-new" id="miNovo">+ MANEJO</button></section>';
  $('miEditarArea').onclick=()=>editarAreaMI(false);
  $('miNovo').onclick=()=>abrirFormularioMI();
@@ -257,9 +259,9 @@ function relatorioMI(){
  const box=$('miReportView');if(box.classList.contains('on')){box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');return}
  const grupos=gruposRelatorioMI(),quantidade=grupos.reduce((n,g)=>n+g.registros.length,0);
  box.innerHTML='<div class="mi-report-top"><button type="button" class="btn" id="miVoltarRel">← VOLTAR</button></div><h3>RELATÓRIO GERAL — MANEJO DAS LAVOURAS</h3><p class="mi-note">'+quantidade+' registros • '+$('miTotal').textContent+' de área cadastrada</p>'+
- (grupos.length?grupos.map(g=>'<section class="mi-report-area"><h4>'+esc(g.nome)+' — '+formatoHaMI(g.ha)+' HA <small>('+g.registros.length+' manejos)</small></h4>'+
+ (grupos.length?grupos.map(g=>'<section class="mi-report-area"><h4>'+esc(caixaAlta(g.nome))+' — '+formatoHaMI(g.ha)+' ha <small>('+g.registros.length+' manejos)</small></h4>'+
  '<div style="overflow-x:auto"><table><thead><tr><th>DATA</th><th>MANEJO</th><th>PRODUTOS / DOSES</th></tr></thead><tbody>'+
- g.registros.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(r.tipo)+'</td><td>'+esc((r.produtos||[]).map(p=>p.produto+' '+formatoDoseMI(p.dose)+' '+p.unidade+'/ha').join(' / ')||r.observacao||'—')+'</td></tr>').join('')+
+ g.registros.map(r=>'<tr><td>'+dataBRMI(r.dia)+'</td><td>'+esc(caixaAlta(r.tipo))+'</td><td>'+esc((r.produtos||[]).map(p=>caixaAlta(p.produto)+' '+formatoDoseMI(p.dose)+' '+unidade(p.unidade)+'/ha').join(' / ')||caixaAlta(r.observacao)||'—')+'</td></tr>').join('')+
  '</tbody></table></div></section>').join(''):'<p>Nenhum manejo cadastrado.</p>')+
  '<div class="actions"><button class="btn pri" id="miExportar">EXPORTAR PDF</button></div>';
  box.classList.add('on');document.body.classList.add('mi-relatorio-aberto');box.scrollTop=0;$('miExportar').onclick=exportarMI;$('miVoltarRel').onclick=()=>{box.classList.remove('on');document.body.classList.remove('mi-relatorio-aberto');};
@@ -270,11 +272,11 @@ function exportarMI(){
  const linhaPDF=(linha)=>{for(const trecho of doc.splitTextToSize(String(linha),184)){if(y>280){doc.addPage();y=17}doc.text(trecho,12,y);y+=5}};
  for(const g of gruposRelatorioMI()){
   if(y>258){doc.addPage();y=17}
-  doc.setFont('helvetica','bold');linhaPDF(g.nome+' - '+formatoHaMI(g.ha)+' HA ('+g.registros.length+' manejos)');doc.setFont('helvetica','normal');y+=2;
+  doc.setFont('helvetica','bold');linhaPDF(caixaAlta(g.nome)+' - '+formatoHaMI(g.ha)+' ha ('+g.registros.length+' manejos)');doc.setFont('helvetica','normal');y+=2;
   for(const r of g.registros){
-   linhaPDF(dataBRMI(r.dia)+'  '+r.tipo);
-   for(const p of r.produtos||[])linhaPDF('   '+p.produto+': '+formatoDoseMI(p.dose)+' '+p.unidade+'/ha');
-   if(!(r.produtos||[]).length&&r.observacao)linhaPDF('   '+r.observacao);
+   linhaPDF(dataBRMI(r.dia)+'  '+caixaAlta(r.tipo));
+   for(const p of r.produtos||[])linhaPDF('   '+caixaAlta(p.produto)+': '+formatoDoseMI(p.dose)+' '+unidade(p.unidade)+'/ha');
+   if(!(r.produtos||[]).length&&r.observacao)linhaPDF('   '+caixaAlta(r.observacao));
    y+=3;
   }
   y+=5;
