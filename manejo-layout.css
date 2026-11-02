@@ -62,3 +62,16 @@ body.mi-relatorio-aberto{overflow:hidden!important}
 
 #areaManejoIntegrado .mi-report-top{max-width:900px;margin:0 auto 14px;display:flex;justify-content:flex-start}
 #areaManejoIntegrado .mi-report-top .btn{background:#fff;border:1px solid #cad8cd;border-radius:9px;color:#245d39;font-weight:900;padding:10px 15px}
+
+/* Área total e ações ajustadas para a largura do celular. */
+@media(max-width:600px){
+ #areaManejoIntegrado .mi-tools{grid-template-columns:minmax(0,1fr);gap:10px;align-items:stretch}
+ #areaManejoIntegrado .mi-total{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:none;min-width:0;padding:10px 12px;font-size:13px;line-height:1.2;border-left-width:5px}
+ #areaManejoIntegrado .mi-total strong{display:inline-block;flex:0 0 auto;margin:0;font-size:25px;line-height:1.1;white-space:nowrap}
+ #areaManejoIntegrado .mi-toolbuttons{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #areaManejoIntegrado .mi-toolbuttons .mi-caderno,
+ #areaManejoIntegrado .mi-toolbuttons .mi-report{display:flex;align-items:center;justify-content:center;min-height:48px;height:100%;padding:9px 8px;font-size:11px;line-height:1.25;white-space:normal;overflow-wrap:normal;text-align:center;box-sizing:border-box}
+ #areaManejoIntegrado .mi-picker{align-items:stretch;grid-template-columns:minmax(0,1fr) 76px;gap:8px}
+ #areaManejoIntegrado .mi-picker select{width:100%;min-width:0;height:40px;margin:0;font-size:13px}
+ #areaManejoIntegrado .mi-areaadd{min-width:0;height:40px;margin:0;padding:0 8px;font-size:12px;white-space:nowrap}
+}
