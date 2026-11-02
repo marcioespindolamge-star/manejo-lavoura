@@ -75,3 +75,18 @@ body.mi-relatorio-aberto{overflow:hidden!important}
  #areaManejoIntegrado .mi-picker select{width:100%;min-width:0;height:40px;margin:0;font-size:13px}
  #areaManejoIntegrado .mi-areaadd{min-width:0;height:40px;margin:0;padding:0 8px;font-size:12px;white-space:nowrap}
 }
+
+/* Relatório: textos completos dentro da largura disponível. */
+#areaManejoIntegrado .mi-report-area h4{white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+#areaManejoIntegrado .mi-report-area th,
+#areaManejoIntegrado .mi-report-area td{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.4}
+@media(max-width:600px){
+ #areaManejoIntegrado .mi-reportview.on{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+ #areaManejoIntegrado .mi-report-area{width:100%;min-width:0;box-sizing:border-box}
+ #areaManejoIntegrado .mi-reportview.on .mi-report-area table{width:100%;min-width:0!important;table-layout:fixed}
+ #areaManejoIntegrado .mi-report-area th,
+ #areaManejoIntegrado .mi-report-area td{padding:7px 5px;font-size:11px;min-width:0}
+ #areaManejoIntegrado .mi-report-area th:first-child{width:17%}
+ #areaManejoIntegrado .mi-report-area th:nth-child(2){width:25%}
+ #areaManejoIntegrado .mi-report-area th:nth-child(3){width:58%}
+}
