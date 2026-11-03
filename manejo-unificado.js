@@ -56,14 +56,34 @@ function mostrar(){
  if($('miImport'))$('miImport').onsubmit=importar;
  addProduto();listar();
 }
+function produtosCompradosMI(){
+ const ids=new Set((db.compras||[]).map(c=>String(c.produtoId)));
+ const unicos=new Map();
+ for(const p of db.produtos||[]){
+  if(!ids.has(String(p.id))||!String(p.nome||'').trim())continue;
+  const key=norm(p.nome)+'|'+unidade(p.unidade);
+  if(!unicos.has(key))unicos.set(key,{nome:String(p.nome).trim(),unidade:unidade(p.unidade)});
+ }
+ return [...unicos.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+}
 function addProduto(p={},foco=false){
  const el=document.createElement('div');el.className='r2';el.style.marginBottom='8px';
- el.innerHTML='<div><label>Produto</label><input class="miNome" list="miSugestoes" value="'+esc(p.produto||'')+'" placeholder="Produto"></div><div style="display:flex;gap:5px;align-items:end"><div style="flex:1"><label>Dose/ha</label><input class="miDose" inputmode="decimal" value="'+esc(p.dose||'')+'"></div><div style="width:70px"><label>Unid.</label><select class="miUnidade"><option>L</option><option>KG</option></select></div><button class="btn danger miRem" type="button">×</button></div>';
- $('miProdutos').appendChild(el);el.querySelector('.miUnidade').value=p.unidade||'L';
+ const catalogo=produtosCompradosMI();
+ el.innerHTML='<div><label>Produto</label><select class="miNome" required aria-label="Produto cadastrado nas compras"><option value="">'+(catalogo.length?'SELECIONE O PRODUTO':'CADASTRE PRIMEIRO UMA COMPRA')+'</option></select></div><div style="display:flex;gap:5px;align-items:end"><div style="flex:1"><label>Dose/ha</label><input class="miDose" inputmode="decimal" value="'+esc(p.dose||'')+'"></div><div style="width:70px"><label>Unid.</label><select class="miUnidade"><option>L</option><option>KG</option></select></div><button class="btn danger miRem" type="button">×</button></div>';
+ const select=el.querySelector('.miNome'),unit=el.querySelector('.miUnidade');
+ for(const item of catalogo){
+  const option=document.createElement('option');option.value=item.nome;option.textContent=caixaAlta(item.nome)+' — '+item.unidade;option.dataset.unidade=item.unidade;select.appendChild(option);
+ }
+ const atual=catalogo.find(item=>norm(item.nome)===norm(p.produto)&&item.unidade===unidade(p.unidade));
+ if(atual)select.value=atual.nome;
+ else if(p.produto){
+  const option=document.createElement('option');option.value=p.produto;option.textContent=caixaAlta(p.produto)+' (REGISTRO ANTIGO)';option.disabled=true;option.selected=true;select.appendChild(option);
+ }
+ unit.value=unidade(p.unidade);unit.disabled=true;
+ select.onchange=()=>{unit.value=select.selectedOptions[0]?.dataset.unidade||'L'};
+ $('miProdutos').appendChild(el);
  el.querySelector('.miRem').onclick=()=>el.remove();
- let datalist=$('miSugestoes');if(!datalist){datalist=document.createElement('datalist');datalist.id='miSugestoes';$('miProdutos').appendChild(datalist)}
- datalist.innerHTML=produtosUnicos().map(x=>'<option value="'+esc(caixaAlta(x.nome))+'"></option>').join('');
- if(foco)el.querySelector('.miNome').focus();
+ if(foco)select.focus();
 }
 function limpar(){editing=null;$('miForm').reset();$('miProdutos').innerHTML='';addProduto()}
 function salvarManejo(e){
