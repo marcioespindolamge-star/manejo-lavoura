@@ -205,6 +205,16 @@ function abrirFormularioMI(id){
  if(!id){editing=null;$('miForm').reset();$('miArea').value=areaSelecionadaMI;$('miDia').value=new Date().toLocaleDateString('en-CA');$('miProdutos').innerHTML='';addProduto()}
  $('miFormPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
+function produtoNoCartaoMI(produto, hectares){
+ const dose=num(produto.dose);
+ const area=num(hectares);
+ const un=unidade(produto.unidade);
+ const formatar=valor=>valor.toLocaleString('pt-BR',{maximumFractionDigits:4});
+ const total=area>0?formatar(dose*area)+' '+un:'—';
+ return '<span class="mi-pname">'+esc(caixaAlta(produto.produto))+'</span>'+
+  '<span class="mi-pdose mi-dose-total">'+formatar(dose)+' '+un+'/ha'+
+  '<small>Total: '+total+'</small></span>';
+}
 listar=function(){
  const target=$('miLista');if(!target)return;
  atualizarCatalogoMI();
@@ -212,7 +222,7 @@ listar=function(){
  const rs=rows().filter(r=>chaveMI(r)===area.key).sort((a,b)=>String(a.dia||'').localeCompare(String(b.dia||'')));
  target.innerHTML='<section class="mi-field"><div class="mi-fieldhead"><span class="mi-name">'+esc(caixaAlta(area.nome))+'</span><button class="mi-icon" id="miEditarArea" title="Editar área">✎</button><span class="mi-ha">'+formatoHaMI(area.ha)+' ha</span></div>'+
  (rs.length?rs.map(r=>'<article class="mi-card"><div class="mi-cardtop"><span class="mi-date">'+dataBRMI(r.dia)+'</span><span class="mi-kind">'+esc(caixaAlta(r.tipo||'Outro'))+'</span><button class="mi-icon miEdit" data-id="'+esc(r.id)+'" title="Editar manejo">✎</button><button class="mi-icon danger miDelete" data-id="'+esc(r.id)+'" title="Excluir manejo">×</button></div>'+
- ((r.produtos||[]).length?'<div class="mi-products">'+r.produtos.map(p=>'<span class="mi-pname">'+esc(caixaAlta(p.produto))+'</span><span class="mi-pdose">'+formatoHaMI(p.dose)+' '+esc(unidade(p.unidade))+'</span>').join('')+'</div>':'')+
+ ((r.produtos||[]).length?'<div class="mi-products">'+r.produtos.map(p=>produtoNoCartaoMI(p,r.areaHa)).join('')+'</div>':'')+
  (r.observacao?'<p class="mi-note">'+esc(caixaAlta(r.observacao))+'</p>':'')+'</article>').join(''):'<p class="mi-note" style="padding:12px">Nenhum manejo registrado nesta lavoura.</p>')+
  '<button class="mi-new" id="miNovo">+ MANEJO</button></section>';
  $('miEditarArea').onclick=()=>editarAreaMI(false);
